@@ -25,23 +25,21 @@ const SpacerTop = styled.div`
   margin-top: 20px;
 `;
 
-const CategoriesContainer = styled(Paper)(({theme}) => ({
-    position: "sticky",
-    top: "64px",
-    // display: "flex",
-    // flexDirection: "row",
-    paddingTop: "10px",
-    paddingBottom: "10px",
-    borderTop: `1px solid ${theme.palette.grey[300]}`,
-    borderBottom: `1px solid ${theme.palette.grey[300]}`
-}))
-
+const CategoriesContainer = styled(Paper)(({ theme }) => ({
+  position: "sticky",
+  top: "64px",
+  // display: "flex",
+  // flexDirection: "row",
+  paddingTop: "10px",
+  paddingBottom: "10px",
+  borderTop: `1px solid ${theme.palette.grey[300]}`,
+  borderBottom: `1px solid ${theme.palette.grey[300]}`,
+}));
 
 const CategoryLink = styled.a`
-    color: inherit;
-    text-decoration: none;
+  color: inherit;
+  text-decoration: none;
 `;
-
 
 // const CategoryContainer = styled(Box)`
 //   padding-left: 60px;
@@ -55,7 +53,7 @@ export const RestaurantDetails = () => {
   const dispatch = useDispatch();
   const restaurantId = useParams().id;
 
-const [categorySelected, setCategorySelected] = useState(null)
+  const [categorySelected, setCategorySelected] = useState(null);
 
   useEffect(() => {
     dispatch(fetchRestaurantDetails(restaurantId));
@@ -65,21 +63,21 @@ const [categorySelected, setCategorySelected] = useState(null)
     (state) => state.restaurants.restaurantDetails
   );
 
-
-  const CategoryContainer = styled(Box)( ({ theme, category }) => ({
-    backgroundColor: categorySelected === category.trim() ? theme.palette.primary.main : 'white',
-    color: categorySelected === category.trim() ? 'white': 'inherit',
-    paddingTop: '7px',
-    paddingBottom: '7px',
-    paddingLeft: '25px',
-    paddingRight: '25px',
+  const CategoryContainer = styled(Box)(({ theme, category }) => ({
+    backgroundColor:
+      categorySelected === category.trim()
+        ? theme.palette.primary.main
+        : "white",
+    color: categorySelected === category.trim() ? "white" : "inherit",
+    paddingTop: "7px",
+    paddingBottom: "7px",
+    paddingLeft: "25px",
+    paddingRight: "25px",
     borderRadius: "20px",
     marginRight: "20px",
   }));
 
-  const handleNavigateToCategory = (category) => {
-
-  }
+  const handleNavigateToCategory = (category) => {};
 
   const renderCategories = () => {
     return Object.keys(restaurant.formated_products).map((category) => {
@@ -153,27 +151,41 @@ const [categorySelected, setCategorySelected] = useState(null)
   }
   return (
     <>
-        <Container maxWidth={"false"}>
-        <Box sx={{ display: "flex", flexDirection: "row" }}>
-        <CardMedia
-          component="img"
-          src={process.env.PUBLIC_URL + "/image.jpg"}
-          sx={{ width: "100%", maxWidth: "400px", height: "auto" }}
-        />
-        <SpacerLeft />
-        <Typography variant="h1">{restaurant.name}</Typography>
-      </Box>
-        </Container>
+      <Container maxWidth={"false"}>
+        <Box
+          sx={
+            desktop
+              ? { display: "flex", flexDirection: "row" }
+              : { display: "flex", flexDirection: "column" }
+          }
+        >
+          <CardMedia
+            component="img"
+            src={process.env.PUBLIC_URL + "/image.jpg"}
+            sx={{ width: "100%", maxWidth: "400px", height: "auto" }}
+          />
+          <SpacerLeft />
+          <Typography variant="h1">{restaurant.name}</Typography>
+        </Box>
+      </Container>
       <SpacerTop />
 
-      <CategoriesContainer variant="elevation" square >
-          <Container sx={{display: 'flex', flexDirection:"row"}} maxWidth={"false"}>
-            {restaurant.categories_ordered.map((category) => (
-            <CategoryContainer onClick={() => setCategorySelected(category.trim())} category={category}>
-                <CategoryLink href={`#${category.trim()}`}>{category}</CategoryLink>
+      <CategoriesContainer variant="elevation" square>
+        <Container
+          sx={{ display: "flex", flexDirection: "row" }}
+          maxWidth={"false"}
+        >
+          {restaurant.categories_ordered.map((category) => (
+            <CategoryContainer
+              onClick={() => setCategorySelected(category.trim())}
+              category={category}
+            >
+              <CategoryLink href={`#${category.trim()}`}>
+                {category}
+              </CategoryLink>
             </CategoryContainer>
-            ))}
-          </Container>
+          ))}
+        </Container>
       </CategoriesContainer>
       <SpacerTop />
       <Container maxWidth={"false"}>
