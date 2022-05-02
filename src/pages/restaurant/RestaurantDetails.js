@@ -13,9 +13,11 @@ import {
 } from "@mui/material";
 import { spacing } from "@mui/system";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { fetchRestaurantDetails } from "./state/restaurantsSlice";
 import { useTheme } from "@mui/material/styles";
+import { ProductDetails } from "../product/ProductDetails";
+import { openSelectedProductDialog } from "../product/state/productSlice";
 
 const SpacerLeft = styled.div`
   margin-left: 20px;
@@ -46,6 +48,7 @@ const CategoryLink = styled.a`
 // `;
 
 export const RestaurantDetails = () => {
+  const navigate = useNavigate();
   const theme = useTheme();
   const mobile = useMediaQuery(theme.breakpoints.down("sm"));
   const tablet = useMediaQuery(theme.breakpoints.down("md"));
@@ -79,30 +82,19 @@ export const RestaurantDetails = () => {
 
   const handleNavigateToCategory = (category) => {};
 
+  const selectCategory = () => {};
+
   const renderCategories = () => {
     return Object.keys(restaurant.formated_products).map((category) => {
       //   renderProducts(category, restaurant.formated_products[category])
       return (
         <>
-          <a id={category.trim()}>
-            <Typography fontWeight="800" variant="h3">
+          <div id={category.trim()} style={{ scrollMarginTop: "150px" }}>
+            <Typography mt={10} mb={10} fontWeight="800" variant="h3">
               {category.toLocaleUpperCase()}
             </Typography>
-          </a>
-          <Box mt={5}>
-            {/* <Grid container spacing={1}>
-              {restaurantsArray.map((restaurantByThree) => (
-                <Grid
-                  container
-                  item
-                  spacing={5}
-                  direction={desktop ? "row" : "column"}
-                >
-                  <FormRow restaurantByThree={restaurantByThree} />
-                </Grid>
-              ))}
-            </Grid> */}
-
+          </div>
+          <Box>
             <Grid container spacing={1}>
               {restaurant.formated_products[category].map((product) => (
                 <Grid
@@ -113,11 +105,15 @@ export const RestaurantDetails = () => {
                 >
                   <Grid item xs>
                     <Card
+                      onClick={() => dispatch(openSelectedProductDialog({defaultData: product}))}
                       variant="outlined"
                       sx={{
                         display: "flex",
                         flexDirection: "row",
                         justifyContent: "space-between",
+                        maxHeight: "150px",
+                        marginBottom: '10px',
+                        cursor: 'pointer'
                       }}
                     >
                       <Box sx={{ padding: "10px" }}>
@@ -126,7 +122,7 @@ export const RestaurantDetails = () => {
                           {product.description}
                         </Typography>
                         <Typography mt={2} variant="subtitle1">
-                          {product.price}
+                          {product.price} ₪
                         </Typography>
                       </Box>
                       <CardMedia
@@ -152,6 +148,7 @@ export const RestaurantDetails = () => {
   return (
     <>
       <Container maxWidth={"false"}>
+        <ProductDetails />
         <Box
           sx={
             desktop
@@ -176,14 +173,14 @@ export const RestaurantDetails = () => {
           maxWidth={"false"}
         >
           {restaurant.categories_ordered.map((category) => (
-            <CategoryContainer
-              onClick={() => setCategorySelected(category.trim())}
-              category={category}
-            >
-              <CategoryLink href={`#${category.trim()}`}>
+            <CategoryLink href={`#${category.trim()}`}>
+              <CategoryContainer
+                onClick={() => setCategorySelected(category.trim())}
+                category={category}
+              >
                 {category}
-              </CategoryLink>
-            </CategoryContainer>
+              </CategoryContainer>
+            </CategoryLink>
           ))}
         </Container>
       </CategoriesContainer>

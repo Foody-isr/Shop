@@ -8,6 +8,7 @@ import {
   Card,
   CardContent,
   CardMedia,
+  Container,
   Typography,
   useMediaQuery,
 } from "@mui/material";
@@ -34,19 +35,21 @@ function FormRow(restaurantByThree) {
     <React.Fragment>
       {restaurantByThree.restaurantByThree.map((restaurant) => (
         <Grid item xs>
-            <NavLink to={`/restaurant/${restaurant.restaurantId}`}>
-            <Card>
-            <CardMedia
-              component="img"
-              src={process.env.PUBLIC_URL + "/image.jpg"}
-            />
-            <CardContent>
-              <Typography variant="body2" color="text.secondary">
-                {restaurant.name}
-              </Typography>
-            </CardContent>
-          </Card>
-            </NavLink>
+          <NavLink to={`/restaurant/${restaurant.restaurantId}`}>
+            <Box maxWidth={'400px'} mb={10}>
+              <Card variant="outlined">
+                <CardMedia
+                  component="img"
+                  src={process.env.PUBLIC_URL + "/image.jpg"}
+                />
+                <CardContent>
+                  <Typography variant="body2" color="text.secondary">
+                    {restaurant.name}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Box>
+          </NavLink>
         </Grid>
       ))}
     </React.Fragment>
@@ -70,20 +73,22 @@ export default function NestedGrid() {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Spacer />
-      <Typography variant="h4">Restaurants</Typography>
+      <Container>
+      <Typography variant="h1">Restaurants</Typography>
       <Spacer />
-      <Grid container spacing={1}>
-        {restaurantsArray.map((restaurantByThree) => (
-          <Grid
-            container
-            item
-            spacing={5}
-            direction={desktop ? "row" : "column"}
-          >
-            <FormRow restaurantByThree={restaurantByThree} />
-          </Grid>
-        ))}
-      </Grid>
+        <Grid container spacing={1}>
+            {restaurantsArray.map((restaurantByThree) => (
+            <Grid
+                container
+                item
+                spacing={5}
+                direction={desktop ? "row" : "column"}
+            >
+                <FormRow restaurantByThree={restaurantByThree} />
+            </Grid>
+            ))}
+        </Grid>
+      </Container>
     </Box>
   );
 }

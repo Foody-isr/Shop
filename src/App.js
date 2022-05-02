@@ -4,6 +4,7 @@ import {
   ThemeProvider as MuiThemeProvider,
 } from "@mui/material/styles";
 import { ThemeProvider } from "styled-components/macro";
+import { AuthProvider } from "./contexts/JWTContext";
 import { useTheme } from "@mui/material/styles";
 import { Provider, useDispatch, useSelector } from "react-redux";
 import { store } from "./store";
@@ -41,10 +42,11 @@ function App() {
             <StyledEngineProvider injectFirst>
               <MuiThemeProvider theme={createTheme(theme)}>
                 <ThemeProvider theme={createTheme(theme)}>
-                  {/* <NotificationHandler /> */}
-                  <Suspense fallback={<Loader />}>
-                    <Router />
-                  </Suspense>
+                  <AuthProvider>
+                    <Suspense fallback={<Loader />}>
+                      <Router />
+                    </Suspense>
+                  </AuthProvider>
                 </ThemeProvider>
               </MuiThemeProvider>
             </StyledEngineProvider>
