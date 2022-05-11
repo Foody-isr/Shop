@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  Card,
   CardMedia,
   Checkbox,
   Dialog,
@@ -8,10 +9,11 @@ import {
   IconButton,
   Radio,
   Typography,
+  useMediaQuery,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { closeSelectedProductDialog } from "./state/productSlice";
+import { closeSelectedProductDialog, resetSelectedProductDialog } from "./state/productSlice";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import { set } from "date-fns";
@@ -20,8 +22,12 @@ import {
   IndeterminateCheckBox,
   IndeterminateCheckBoxTwoTone,
 } from "@mui/icons-material";
+import { useTheme } from "@mui/styles";
+import { v4 as uuidv4 } from 'uuid';
 
-export const ProductDetails = () => {
+export const ProductDetails = ({ addProductToCart }) => {
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
   const dispatch = useDispatch();
   const open = useSelector((state) => state.product.selectedProductDialog.open);
   const defaultData = useSelector(
@@ -29,45 +35,15 @@ export const ProductDetails = () => {
   );
   const [count, setCount] = useState(1);
   const [total, setTotal] = useState(null);
-  const [selectedToppings, setSelectedToppings] = useState({});
+  const [selectedToppings, setSelectedToppings] = useState(null);
   const [checked, setChecked] = useState(false);
 
+  console.log('DEFAULT DATA ', defaultData);
+  console.log('SELECTED TOPPINGS SELECTED TOPPINGS SELECTED TOPPINGS', selectedToppings);
   useEffect(() => {
     if (defaultData) {
-      setTotal(defaultData.price);
-
-      //   const array = []
-
-      //   defaultData.toppings && defaultData.toppings.forEach(topping => {
-      //     if(topping.max_choices == 1){
-      //         let objectOptions = [];
-      //         topping.product_toppings_options.forEach(option => {
-      //             let object= {"name" : option.name, "checked": false};
-      //             objectOptions.push(object)
-
-      //         })
-      //         let object = {"name": topping.name ,"options": objectOptions};
-      //         array.push(object)
-
-      //     }
-      //   })
-
-      //   setSelectedToppings(array);
-
-      //   defaultData.toppings && defaultData.toppings.forEach(topping => {
-      //     if(topping.max_choices == 1){
-      //         let objectOptions = [];
-      //         topping.product_toppings_options.forEach(option => {
-      //             let object= {"name" : option.name, "checked": false};
-      //             objectOptions.push(object)
-
-      //         })
-      //         let object = {"name": topping.name ,"options": objectOptions};
-      //         array.push(object)
-
-      //     }
-      //   })
-
+      setTotal(defaultData.price)
+      setSelectedToppings(null)
       let hash = {};
       defaultData.toppings &&
         defaultData.toppings.forEach((topping) => {
@@ -93,24 +69,28 @@ export const ProductDetails = () => {
         });
     }
 
-    // console.log('count', count)
-  }, [defaultData]);
+  }, [defaultData, open])
 
   useEffect(() => {
     setTotal(defaultData.price * count);
   }, [count]);
 
+//   useEffect(() => {
+
+//   }, [open]);
+
   useEffect(() => {
     setTotal(parseInt(defaultData.price));
     let totalTmp = parseInt(defaultData.price);
-    Object.keys(selectedToppings).forEach((key, index) => {
+    selectedToppings && Object.keys(selectedToppings).forEach((key, index) => {
       //   console.log(`${key}: ${selectedToppings[key]}`);
       if (Array.isArray(selectedToppings[key])) {
         //Search for free_choices of this topping
         const indexTopping = defaultData.toppings.findIndex(
           (e) => e.name === key
         );
-        const free_choices = defaultData.toppings[indexTopping].free_choices;
+
+        const free_choices = indexTopping != -1 && defaultData.toppings[indexTopping].free_choices;
         // console.log("FREE CHOICES ", key, free_choices);
 
         // Remove all selected option to calcul how free option is already choose
@@ -148,9 +128,11 @@ export const ProductDetails = () => {
   }, [selectedToppings]);
 
   const onClose = () => {
-    // setCount(1)
-    // setTotal(defaultData.price)
+    setCount(1)
+    setTotal(defaultData.price)
+    setSelectedToppings(null);
     dispatch(closeSelectedProductDialog());
+    dispatch(resetSelectedProductDialog())
   };
 
   const incrementCount = () => {
@@ -165,11 +147,36 @@ export const ProductDetails = () => {
     }
   };
 
+  const handleSubmit = () => {
+    //   console.log("SUBMIT", selectedToppings)
+    // console.log("SUBMIT", defaultData);
+    const array = []
+    const { name, description, picture, price, } = defaultData;
+    const result = {
+      id: uuidv4(),
+      name,
+      description,
+      picture,
+      price,
+      toppings: selectedToppings,
+      total: parseInt(total),
+      count: count,
+
+    };
+    console.log("SUBMIT", result);
+    // for(let i = 0; i<count; i++){
+    //     console.log('FOR LOOP', count)
+    //     array.push(result)
+    // }
+    addProductToCart(result);
+    onClose()
+  };
+
   const selectCheckbox = (toppingIndex, optionIndex, topping, option) => {
     if (topping.max_choices == 1) {
       let updatedValue = {};
       if (selectedToppings[topping.name].name === option.name) {
-        updatedValue[topping.name] = { name: null, price: null };
+        updatedValue[topping.name] = { name: null, price: null};
       } else {
         updatedValue[topping.name] = { name: option.name, price: option.price };
       }
@@ -187,6 +194,7 @@ export const ProductDetails = () => {
           cloneArray[cloneArray.length - 1] = {
             name: option.name,
             price: option.price,
+            multiple: option.multiple
           };
         }
         let updatedValue = {};
@@ -199,7 +207,7 @@ export const ProductDetails = () => {
         if (cloneArray[optionIndex].name === option.name) {
           cloneArray[optionIndex] = { name: null, price: null };
         } else {
-          cloneArray[optionIndex] = { name: option.name, price: option.price };
+          cloneArray[optionIndex] = { name: option.name, price: option.price, multiple: option.multiple };
         }
         let updatedValue = {};
         updatedValue[topping.name] = cloneArray;
@@ -212,20 +220,9 @@ export const ProductDetails = () => {
   };
 
   const renderCheck = (topping, option) => {
-    // selectedToppings.forEach(element => {
-    //     if(element.name === topping.name){
-    //         console.log('EQUAL', element)
-    //         const index = element.options.findIndex( e => e.name === option.name );
-    //         console.log('INDEX ', index)
-    //         if(element.options[index].checked == 1){
-    //             return true
-    //         }
-    //     }
-    // })
-    // return false
-    // console.log("total ", total);
-    // console.log("SELECTED TOPPINGS RENDER CHECK ", selectedToppings);
-    if (topping.max_choices <= 1) {
+    console.log('RENDER CHECK')
+    console.log("SELECTED TOPPINGS ", selectedToppings);
+    if (selectedToppings && topping.max_choices <= 1) {
       if (
         selectedToppings[topping.name] &&
         selectedToppings[topping.name].name === option.name
@@ -233,28 +230,42 @@ export const ProductDetails = () => {
         return true;
       }
       return false;
-    } else if (topping.max_choices > 1) {
+    } else if (selectedToppings && topping.max_choices > 1) {
       const index =
         selectedToppings[topping.name] &&
         selectedToppings[topping.name].findIndex((e) => e.name === option.name);
-      //   console.log("INDEX INDEX INDEX ", index);
       if (index !== -1) {
         return true;
       } else {
         return false;
       }
-      // selectedToppings[topping.name] && selectedToppings[topping.name].forEach( e => {
-      //     if(e.name === option.name){
-      //         console.log('TRUE ', e.name, option.name)
-      //         return true
-      //     }
-      //     console.log('FALSE ', e.name, option.name)
-      //     return false
-      // })
     }
   };
 
   const renderDisabled = (topping, option) => {
+
+    // console.log('RENDER DISABLED ', topping)
+    // console.log('RENDER DISABLED ', option)
+    const selectedToppingObject = selectedToppings && selectedToppings[topping.name];
+    // console.log('RENDER DISABLED selectedToppingObject ', selectedToppingObject)
+    let boolean = false;
+
+
+    if(Array.isArray(selectedToppingObject)){
+        const max_choices = topping.max_choices;
+        const filteredArray = selectedToppingObject.filter(e => e.name)
+        const index = selectedToppingObject.findIndex(e => e.name === option.name);
+        if(filteredArray.length > 0 && filteredArray.length >= max_choices && index == -1){
+            boolean = true;
+        }
+        console.log('RENDER DISABLED FILTERED ARRAY ', filteredArray)
+    }else{
+        if((selectedToppingObject && selectedToppingObject.name && selectedToppingObject.name !== option.name )){
+            boolean = true;
+        }
+    }
+
+    return boolean
     // const toppingIndex = selectedToppings.findIndex( toppingElement => toppingElement.name === topping.name)
     // let condition = false;
     // if(toppingIndex !== -1){
@@ -275,7 +286,7 @@ export const ProductDetails = () => {
     const cloneArray = [...selectedToppings[topping.name]];
     for (let i = 0; i < cloneArray.length; i++) {
       if (!cloneArray[i].name) {
-        cloneArray[i] = { name: option.name, price: option.price };
+        cloneArray[i] = { name: option.name, price: option.price, multiple: option.multiple };
         break;
       }
     }
@@ -306,25 +317,36 @@ export const ProductDetails = () => {
   const renderLabel = (toppingIndex, optionIndex, topping, option) => {
     const free_choices = defaultData.toppings[toppingIndex].free_choices;
     // console.log("FREE CHOICES ", topping.name, free_choices);
-    console.log("SELECTED TOPPINGS ", selectedToppings);
     let newArray = [];
     let boolean = false;
-    Object.keys(selectedToppings).forEach((key, index) => {
-      if (key === topping.name && Array.isArray(selectedToppings[key])) {
-        newArray = selectedToppings[key].filter((e) => e.name);
-        if (newArray.length >= topping.free_choices) {
-          boolean = true;
-        }
-      }
-    });
+    if(selectedToppings){
+        Object.keys(selectedToppings).forEach((key, index) => {
+            if (key === topping.name && Array.isArray(selectedToppings[key])) {
+              newArray = selectedToppings[key].filter((e) => e.name);
+              if (newArray.length >= topping.free_choices) {
+                boolean = true;
+              }
+            }
+          });
+    }
 
     let selectedOptionIndex =
-      Array.isArray(selectedToppings[topping.name]) &&
+      selectedToppings && Array.isArray(selectedToppings[topping.name]) &&
       selectedToppings[topping.name].findIndex((e) => e.name === option.name);
+
+    console.log("OPTION ", option);
 
     // console.log("NEW ARRAY ", newArray);
     // if (boolean && selectedOptionIndex === -1)
-    if (boolean) {
+    if (boolean && selectedOptionIndex === -1) {
+      return <Typography>{option.name + ` + ${option.price}`}</Typography>;
+    } else if (boolean && option.multiple) {
+      return <Typography>{option.name + ` + ${option.price}`}</Typography>;
+    } else if (
+       selectedToppings &&
+      !Array.isArray(selectedToppings[topping.name]) &&
+      option.price > 0
+    ) {
       return <Typography>{option.name + ` + ${option.price}`}</Typography>;
     } else {
       return <Typography>{option.name}</Typography>;
@@ -333,18 +355,18 @@ export const ProductDetails = () => {
 
   const renderToppingOption = (toppingIndex, optionIndex, topping, option) => {
     const disabled = renderDisabled(topping, option);
-    // console.log("DISABLED ", disabled);
+    console.log("DISABLED ", disabled);
 
     // Check how many choices are already selected
     let newArrayEachOptionSelected = [];
     let newArrayAllOptionsSelected = [];
-    if (Array.isArray(selectedToppings[topping.name])) {
+    if (selectedToppings && Array.isArray(selectedToppings[topping.name])) {
       newArrayAllOptionsSelected = selectedToppings[topping.name].filter(
         (e) => e.name
       );
     }
 
-    if (Array.isArray(selectedToppings[topping.name])) {
+    if (selectedToppings && Array.isArray(selectedToppings[topping.name])) {
       newArrayEachOptionSelected = selectedToppings[topping.name].filter(
         (e) => e.name === option.name
       );
@@ -364,7 +386,7 @@ export const ProductDetails = () => {
                 selectCheckbox(toppingIndex, optionIndex, topping, option)
               }
               checked={renderCheck(topping, option)}
-              // disabled={disabled}
+              disabled={disabled}
             />
           }
           label={renderLabel(toppingIndex, optionIndex, topping, option)}
@@ -401,14 +423,14 @@ export const ProductDetails = () => {
   };
 
   return (
-    <Dialog fullWidth open={open} onClose={onClose}>
+    <Dialog open={open} onClose={onClose}>
       <Box>
         <CardMedia
           component="img"
           image={defaultData.picture}
           alt="Live from space album cover"
         />
-        <Box p={5}>
+        <Box p={5} mb={5}>
           <Typography variant="h2">{defaultData.name}</Typography>
           <Box>
             {defaultData.toppings &&
@@ -448,38 +470,48 @@ export const ProductDetails = () => {
               ))}
           </Box>
         </Box>
-        <Box p={5}>
-          <Box
-            display="flex"
-            flexDirection="row"
-            justifyContent="center"
-            alignItems="center"
+        <Box sx={{ position: "sticky", bottom: 0 }}>
+          <Card
+            variant="outlined"
+            sx={{ boxShadow: "rgba(0, 0, 0, 0.30) 0px 5px 15px" }}
           >
-            <IconButton
-              color="primary"
-              onClick={decrementCount}
-              disabled={count === 1}
+            <Box
+              display="flex"
+              flexDirection="row"
+              justifyContent="center"
+              alignItems="center"
             >
-              <RemoveCircleOutlineIcon fontSize={"large"} />
-            </IconButton>
-            <Typography
-              variant="button"
-              fontSize={22}
-              sx={{ marginLeft: "50px", marginRight: "50px" }}
-            >
-              {count}
-            </Typography>
-            <IconButton color="primary" onClick={() => incrementCount()}>
-              <AddCircleOutlineIcon fontSize={"large"} />
-            </IconButton>
-          </Box>
-          <Box mt={3}>
-            <Button variant="contained" fullWidth sx={{ height: "50px" }}>
-              <Typography variant="h4" fontWeight={900}>
-                Add for {total} ₪
+              <IconButton
+                color="primary"
+                onClick={decrementCount}
+                disabled={count === 1}
+              >
+                <RemoveCircleOutlineIcon fontSize={"large"} />
+              </IconButton>
+              <Typography
+                variant="button"
+                fontSize={22}
+                sx={{ marginLeft: "50px", marginRight: "50px" }}
+              >
+                {count}
               </Typography>
-            </Button>
-          </Box>
+              <IconButton color="primary" onClick={() => incrementCount()}>
+                <AddCircleOutlineIcon fontSize={"large"} />
+              </IconButton>
+            </Box>
+            <Box m={3}>
+              <Button
+                variant="contained"
+                sx={{ height: "50px" }}
+                fullWidth
+                onClick={handleSubmit}
+              >
+                <Typography variant="h4" fontWeight={900}>
+                  Add for {total} ₪
+                </Typography>
+              </Button>
+            </Box>
+          </Card>
         </Box>
       </Box>
     </Dialog>

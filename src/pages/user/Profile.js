@@ -1,6 +1,6 @@
 import { Box, Container, Tab, Tabs, Typography } from "@mui/material";
 import { Link, Navigate, Outlet } from "react-router-dom";
-import React from "react";
+import React, { useEffect } from "react";
 
 function LinkTab(props) {
     return (
@@ -16,8 +16,19 @@ export const Profile = () => {
     const [value, setValue] = React.useState(0);
 
     const handleChange = (event, newValue) => {
+        console.log('NEW VALUE', newValue)
       setValue(newValue);
     };
+
+    // useEffect(() => {
+    //     effect
+    //     return () => {
+    //         cleanup
+    //     }
+    // }, [input])
+
+
+    console.log('VALUEE ', value)
 
   return (
     <Container>

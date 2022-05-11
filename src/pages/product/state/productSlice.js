@@ -22,6 +22,10 @@ export const productSlice = createSlice({
     },
     closeSelectedProductDialog(state){
         state.selectedProductDialog.open = false
+    },
+    resetSelectedProductDialog(state){
+        console.log('RESET RESET')
+        state.defaultData = {}
     }
   },
 });
@@ -29,7 +33,8 @@ export const productSlice = createSlice({
 // Action creators are generated for each case reducer function
 export const {
     openSelectedProductDialog,
-    closeSelectedProductDialog
+    closeSelectedProductDialog,
+    resetSelectedProductDialog
 } = productSlice.actions;
 
 export default productSlice.reducer;

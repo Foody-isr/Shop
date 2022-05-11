@@ -1,0 +1,31 @@
+[
+    {
+       "free_choices": 0,
+        "id": "591d522b-f7c6-407a-837f-d1dddbed7778",
+        "max_choices": 1,
+        "min_choices": 1,
+        "name": "Poisson",
+        "product_topping_options": [
+            {
+                "name": "Thon mayo",
+                "price": 4,
+                "multiple": null
+            }
+        ]
+    },
+    {
+        "free_choices": 0,
+         "id": "591d522b-f7c6-407a-837f-d1dddbed7778",
+         "max_choices": 1,
+         "min_choices": 1,
+         "name": "Légume",
+         "product_topping_options": [
+             {
+                 "name": "Avocat",
+                 "price": 4,
+                 "multiple": null
+             }
+         ]
+     }
+]
+

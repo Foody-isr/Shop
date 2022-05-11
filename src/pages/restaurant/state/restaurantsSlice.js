@@ -7,6 +7,7 @@ import axiosInstance from "../../../utils/axiosInstance";
 const initialState = {
   restaurants: [],
   restaurantDetails: {},
+  customerDetails: {},
 };
 
 export const restaurantsSlice = createSlice({
@@ -18,6 +19,9 @@ export const restaurantsSlice = createSlice({
     },
     restaurantDetailsReceived(state, action){
       state.restaurantDetails = action.payload
+    },
+    customerDetailsReceived(state, action){
+        state.customerDetails = action.payload
     }
   },
 });
@@ -25,7 +29,8 @@ export const restaurantsSlice = createSlice({
 // Action creators are generated for each case reducer function
 export const {
 restaurantsReceived,
-restaurantDetailsReceived
+restaurantDetailsReceived,
+customerDetailsReceived
 } = restaurantsSlice.actions;
 
 export default restaurantsSlice.reducer;
@@ -36,7 +41,7 @@ export const splitArrayIntoChunksOfLen = (arr, len) => {
       chunks.push(arr.slice(i, i += len));
     }
     return chunks;
-  }
+}
 
 export const fetchRestaurants = () => async (dispatch) => {
   const response = await axiosInstance.get('restaurant');
@@ -48,4 +53,9 @@ export const fetchRestaurants = () => async (dispatch) => {
 export const fetchRestaurantDetails = (id) => async (dispatch) => {
     const response = await axiosInstance.get(`restaurant/${id}`);
     dispatch(restaurantDetailsReceived(response.data));
+  };
+
+export const fetchCustomerDetails = (id) => async (dispatch) => {
+    const response = await axiosInstance.get(`customer`);
+    dispatch(customerDetailsReceived(response.data));
   };

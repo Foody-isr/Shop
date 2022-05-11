@@ -47,7 +47,7 @@ const ResponsiveAppBar = () => {
     }
     else if(setting === 'Profile'){
       setAnchorElUser(null);
-      navigate('/user/profile')
+      navigate('/user/profile/overview')
     }
     setAnchorElUser(null);
   };
