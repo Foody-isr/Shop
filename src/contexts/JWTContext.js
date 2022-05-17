@@ -120,14 +120,18 @@ function AuthProvider({ children }) {
     dispatch({ type: SIGN_OUT });
   };
 
-  const signUp = async (email, password) => {
+  const signUp = async (email, password, customer) => {
+    console.log('CUSTOMER ', customer)
     const response = await axios.post("/auth/signup", {
       email,
       password,
+      customer
     });
     const { accessToken } = response.data;
-    const user = response.data.user.email
-    window.localStorage.setItem("accessToken", accessToken);
+    // const user = response.data.user.email
+    const user = response.data.user
+    // window.localStorage.setItem("accessToken", accessToken);
+    setSession(accessToken);
     dispatch({
       type: SIGN_UP,
       payload: {

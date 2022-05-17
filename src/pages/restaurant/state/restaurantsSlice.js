@@ -8,6 +8,8 @@ const initialState = {
   restaurants: [],
   restaurantDetails: {},
   customerDetails: {},
+  closed: false,
+  cities: [],
 };
 
 export const restaurantsSlice = createSlice({
@@ -22,6 +24,12 @@ export const restaurantsSlice = createSlice({
     },
     customerDetailsReceived(state, action){
         state.customerDetails = action.payload
+    },
+    closedRestaurant(state, action){
+      state.closed = action.payload
+    },
+    citiesReceived(state, action){
+      state.cities = action.payload
     }
   },
 });
@@ -30,7 +38,9 @@ export const restaurantsSlice = createSlice({
 export const {
 restaurantsReceived,
 restaurantDetailsReceived,
-customerDetailsReceived
+customerDetailsReceived,
+closedRestaurant,
+citiesReceived
 } = restaurantsSlice.actions;
 
 export default restaurantsSlice.reducer;
@@ -55,7 +65,13 @@ export const fetchRestaurantDetails = (id) => async (dispatch) => {
     dispatch(restaurantDetailsReceived(response.data));
   };
 
-export const fetchCustomerDetails = (id) => async (dispatch) => {
-    const response = await axiosInstance.get(`customer`);
-    dispatch(customerDetailsReceived(response.data));
-  };
+
+export const fetchAllCities = () => async (dispatch) => {
+  const response = await axiosInstance.get('city');
+  dispatch(citiesReceived(response.data));
+};
+
+// export const fetchCustomerDetails = (id) => async (dispatch) => {
+//     const response = await axiosInstance.get(`customer`);
+//     dispatch(customerDetailsReceived(response.data));
+//   };

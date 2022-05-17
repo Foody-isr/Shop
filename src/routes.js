@@ -7,6 +7,8 @@ import { SignIn } from "./pages/auth/SignIn";
 import { Profile } from "./pages/user/Profile";
 import { Overview } from "./pages/user/Overview";
 import { PaymentMethods } from "./pages/user/PaymentMethods";
+import { Addresses } from "./pages/user/Addresses";
+import { SignUp } from "./pages/auth/SignUp";
 
 export default function Router() {
 
@@ -22,7 +24,8 @@ export default function Router() {
       path: "/auth",
       element: <MainLayout />,
       children: [
-        { path: "signin", element: <SignIn /> }
+        { path: "signin", element: <SignIn /> },
+        { path: "signup", element: <SignUp /> }
       ]
     },
     {
@@ -40,6 +43,10 @@ export default function Router() {
             {
               path: "payment_methods",
               element: <PaymentMethods />
+            },
+            {
+              path: "my_addresses",
+              element: <Addresses />
             }
           ]
        }

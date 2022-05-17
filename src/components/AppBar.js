@@ -125,7 +125,7 @@ const ResponsiveAppBar = () => {
             <Tooltip title="Open settings">
               {user ? (
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar>{user.first_name[0]}</Avatar>
+                  <Avatar>{user.first_name && user.first_name[0]}</Avatar>
                 </IconButton>
               ) : (
                 <NavLink to={'/auth/signin'}>

@@ -84,6 +84,12 @@ export const RestaurantDetails = () => {
     (state) => state.restaurants.restaurantDetails
   );
 
+  const closed = useSelector(
+    (state) => state.restaurants.closed
+  );
+
+  console.log('RESTAURANT CLOSE', closed)
+
   useEffect(() => {
     dispatch(fetchRestaurantDetails(restaurantId));
   }, []);
@@ -222,9 +228,11 @@ export const RestaurantDetails = () => {
     if(!user){
       alert('You need to login')
     }else{
-      dispatch(
-        openSelectedProductDialog({ defaultData: product })
-      )
+
+        dispatch(
+          openSelectedProductDialog({ defaultData: product })
+        )
+
     }
   }
 
