@@ -33,36 +33,38 @@ export const ProductDetails = ({ addProductToCart }) => {
   const defaultData = useSelector(
     (state) => state.product.selectedProductDialog.defaultData
   );
+  console.log('DEFAULT DATA ', defaultData)
   const [count, setCount] = useState(1);
   const [total, setTotal] = useState(null);
-  const [selectedToppings, setSelectedToppings] = useState(null);
+  const [selectedOptions, setSelectedOptions] = useState(null);
+  console.log('selectedOptions ', selectedOptions)
   const [checked, setChecked] = useState(false);
 
   console.log('DEFAULT DATA ', defaultData);
-  console.log('SELECTED TOPPINGS SELECTED TOPPINGS SELECTED TOPPINGS', selectedToppings);
+  console.log('SELECTED OPTIONS SELECTED OPTIONS SELECTED OPTIONS', selectedOptions);
   useEffect(() => {
     if (defaultData) {
       setTotal(defaultData.price)
-      setSelectedToppings(null)
+      setSelectedOptions(null)
       let hash = {};
-      defaultData.toppings &&
-        defaultData.toppings.forEach((topping) => {
-          if (topping.max_choices == 1) {
+      defaultData.options &&
+        defaultData.options.forEach((topping) => {
+          if (topping.maxChoices == 1) {
             hash[topping.name] = { name: null, price: null };
-            setSelectedToppings((selectedToppings) => ({
-              ...selectedToppings,
+            setSelectedOptions((selectedOptions) => ({
+              ...selectedOptions,
               ...hash,
             }));
-          } else if (topping.max_choices > 1) {
+          } else if (topping.maxChoices > 1) {
             hash[topping.name] = [];
             // topping.product_toppings_options.forEach(option => {
             //     hash[topping.name].push({name: null, price:null})
             // })
-            for (let i = 0; i < topping.max_choices; i++) {
+            for (let i = 0; i < topping.maxChoices; i++) {
               hash[topping.name].push({ name: null, price: null });
             }
-            setSelectedToppings((selectedToppings) => ({
-              ...selectedToppings,
+            setSelectedOptions((selectedOptions) => ({
+              ...selectedOptions,
               ...hash,
             }));
           }
@@ -82,19 +84,19 @@ export const ProductDetails = ({ addProductToCart }) => {
   useEffect(() => {
     setTotal(parseInt(defaultData.price));
     let totalTmp = parseInt(defaultData.price);
-    selectedToppings && Object.keys(selectedToppings).forEach((key, index) => {
+    selectedOptions && Object.keys(selectedOptions).forEach((key, index) => {
       //   console.log(`${key}: ${selectedToppings[key]}`);
-      if (Array.isArray(selectedToppings[key])) {
+      if (Array.isArray(selectedOptions[key])) {
         //Search for free_choices of this topping
-        const indexTopping = defaultData.toppings.findIndex(
+        const indexTopping = defaultData.options.findIndex(
           (e) => e.name === key
         );
 
-        const free_choices = indexTopping != -1 && defaultData.toppings[indexTopping].free_choices;
+        const freeChoices = indexTopping != -1 && defaultData.options[indexTopping].freeChoices;
         // console.log("FREE CHOICES ", key, free_choices);
 
         // Remove all selected option to calcul how free option is already choose
-        const newArray = selectedToppings[key].filter((e) => e.name);
+        const newArray = selectedOptions[key].filter((e) => e.name);
 
         // selectedToppings[key].forEach(e =>{
         //     if(e.price){
@@ -106,31 +108,31 @@ export const ProductDetails = ({ addProductToCart }) => {
         //           }
         //     }
         // })
-        for (let i = free_choices; i < newArray.length; i++) {
-          if (selectedToppings[key][i].price) {
+        for (let i = freeChoices; i < newArray.length; i++) {
+          if (selectedOptions[key][i].price) {
             // If already choosed all free_choices so add option price
 
-            if (newArray.length > free_choices) {
-              console.log("PRICE ", selectedToppings[key][i].price);
+            if (newArray.length > freeChoices) {
+              console.log("PRICE ", selectedOptions[key][i].price);
               totalTmp =
-                parseInt(totalTmp) + parseInt(selectedToppings[key][i].price);
+                parseInt(totalTmp) + parseInt(selectedOptions[key][i].price);
             }
           }
         }
       } else {
-        if (selectedToppings[key].price) {
+        if (selectedOptions[key].price) {
           // setTotal(parseInt(defaultData.price) + parseInt(selectedToppings[key].price))
-          totalTmp = parseInt(totalTmp) + parseInt(selectedToppings[key].price);
+          totalTmp = parseInt(totalTmp) + parseInt(selectedOptions[key].price);
         }
       }
     });
     setTotal(totalTmp);
-  }, [selectedToppings]);
+  }, [selectedOptions]);
 
   const onClose = () => {
     setCount(1)
     setTotal(defaultData.price)
-    setSelectedToppings(null);
+    setSelectedOptions(null);
     dispatch(closeSelectedProductDialog());
     dispatch(resetSelectedProductDialog())
   };
@@ -151,14 +153,14 @@ export const ProductDetails = ({ addProductToCart }) => {
     //   console.log("SUBMIT", selectedToppings)
     // console.log("SUBMIT", defaultData);
     const array = []
-    const { name, description, picture, price, } = defaultData;
+    const { name, description, image, price, } = defaultData;
     const result = {
       id: uuidv4(),
       name,
       description,
-      picture,
+      image,
       price,
-      toppings: selectedToppings,
+      options: selectedOptions,
       total: parseInt(total),
       count: count,
 
@@ -173,19 +175,23 @@ export const ProductDetails = ({ addProductToCart }) => {
   };
 
   const selectCheckbox = (toppingIndex, optionIndex, topping, option) => {
-    if (topping.max_choices == 1) {
+    console.log('selectCheckbox - topping ', topping)
+    console.log('selectCheckbox - option ', option)
+    if (topping.maxChoices == 1) {
+      console.log('selectedOptions[topping.name] ', selectedOptions[topping.name])
       let updatedValue = {};
-      if (selectedToppings[topping.name].name === option.name) {
+      if (selectedOptions[topping.name].name === option.name) {
         updatedValue[topping.name] = { name: null, price: null};
       } else {
+        console.log('updatedValue - option ', option)
         updatedValue[topping.name] = { name: option.name, price: option.price };
       }
-      setSelectedToppings((selectedToppings) => ({
-        ...selectedToppings,
+      setSelectedOptions((selectedOptions) => ({
+        ...selectedOptions,
         ...updatedValue,
       }));
-    } else if (topping.max_choices > 1) {
-      const cloneArray = [...selectedToppings[topping.name]];
+    } else if (topping.maxChoices > 1) {
+      const cloneArray = [...selectedOptions[topping.name]];
 
       if (typeof cloneArray[optionIndex] == "undefined") {
         if (cloneArray[cloneArray.length - 1].name === option.name) {
@@ -199,8 +205,8 @@ export const ProductDetails = ({ addProductToCart }) => {
         }
         let updatedValue = {};
         updatedValue[topping.name] = cloneArray;
-        setSelectedToppings((selectedToppings) => ({
-          ...selectedToppings,
+        setSelectedOptions((selectedOptions) => ({
+          ...selectedOptions,
           ...updatedValue,
         }));
       } else {
@@ -211,8 +217,8 @@ export const ProductDetails = ({ addProductToCart }) => {
         }
         let updatedValue = {};
         updatedValue[topping.name] = cloneArray;
-        setSelectedToppings((selectedToppings) => ({
-          ...selectedToppings,
+        setSelectedOptions((selectedOptions) => ({
+          ...selectedOptions,
           ...updatedValue,
         }));
       }
@@ -221,19 +227,19 @@ export const ProductDetails = ({ addProductToCart }) => {
 
   const renderCheck = (topping, option) => {
     console.log('RENDER CHECK')
-    console.log("SELECTED TOPPINGS ", selectedToppings);
-    if (selectedToppings && topping.max_choices <= 1) {
+    console.log("SELECTED TOPPINGS ", selectedOptions);
+    if (selectedOptions && topping.maxChoices <= 1) {
       if (
-        selectedToppings[topping.name] &&
-        selectedToppings[topping.name].name === option.name
+        selectedOptions[topping.name] &&
+        selectedOptions[topping.name].name === option.name
       ) {
         return true;
       }
       return false;
-    } else if (selectedToppings && topping.max_choices > 1) {
+    } else if (selectedOptions && topping.maxChoices > 1) {
       const index =
-        selectedToppings[topping.name] &&
-        selectedToppings[topping.name].findIndex((e) => e.name === option.name);
+        selectedOptions[topping.name] &&
+        selectedOptions[topping.name].findIndex((e) => e.name === option.name);
       if (index !== -1) {
         return true;
       } else {
@@ -246,16 +252,16 @@ export const ProductDetails = ({ addProductToCart }) => {
 
     // console.log('RENDER DISABLED ', topping)
     // console.log('RENDER DISABLED ', option)
-    const selectedToppingObject = selectedToppings && selectedToppings[topping.name];
+    const selectedToppingObject = selectedOptions && selectedOptions[topping.name];
     // console.log('RENDER DISABLED selectedToppingObject ', selectedToppingObject)
     let boolean = false;
 
 
     if(Array.isArray(selectedToppingObject)){
-        const max_choices = topping.max_choices;
+        const maxChoices = topping.maxChoices;
         const filteredArray = selectedToppingObject.filter(e => e.name)
         const index = selectedToppingObject.findIndex(e => e.name === option.name);
-        if(filteredArray.length > 0 && filteredArray.length >= max_choices && index == -1){
+        if(filteredArray.length > 0 && filteredArray.length >= maxChoices && index == -1){
             boolean = true;
         }
         console.log('RENDER DISABLED FILTERED ARRAY ', filteredArray)
@@ -283,7 +289,7 @@ export const ProductDetails = ({ addProductToCart }) => {
   };
 
   const incrementMultiple = (toppingindex, optionIndex, topping, option) => {
-    const cloneArray = [...selectedToppings[topping.name]];
+    const cloneArray = [...selectedOptions[topping.name]];
     for (let i = 0; i < cloneArray.length; i++) {
       if (!cloneArray[i].name) {
         cloneArray[i] = { name: option.name, price: option.price, multiple: option.multiple };
@@ -292,14 +298,14 @@ export const ProductDetails = ({ addProductToCart }) => {
     }
     let updatedValue = {};
     updatedValue[topping.name] = cloneArray;
-    setSelectedToppings((selectedToppings) => ({
-      ...selectedToppings,
+    setSelectedOptions((selectedOptions) => ({
+      ...selectedOptions,
       ...updatedValue,
     }));
   };
 
   const decrementMultiple = (toppingindex, optionIndex, topping, option) => {
-    const cloneArray = [...selectedToppings[topping.name]];
+    const cloneArray = [...selectedOptions[topping.name]];
     for (let i = 0; i < cloneArray.length; i++) {
       if (cloneArray[i].name === option.name) {
         cloneArray[i] = { name: null, price: null };
@@ -308,22 +314,22 @@ export const ProductDetails = ({ addProductToCart }) => {
     }
     let updatedValue = {};
     updatedValue[topping.name] = cloneArray;
-    setSelectedToppings((selectedToppings) => ({
-      ...selectedToppings,
+    setSelectedOptions((selectedOptions) => ({
+      ...selectedOptions,
       ...updatedValue,
     }));
   };
 
   const renderLabel = (toppingIndex, optionIndex, topping, option) => {
-    const free_choices = defaultData.toppings[toppingIndex].free_choices;
+    const freeChoices = defaultData.options[toppingIndex].freeChoices;
     // console.log("FREE CHOICES ", topping.name, free_choices);
     let newArray = [];
     let boolean = false;
-    if(selectedToppings){
-        Object.keys(selectedToppings).forEach((key, index) => {
-            if (key === topping.name && Array.isArray(selectedToppings[key])) {
-              newArray = selectedToppings[key].filter((e) => e.name);
-              if (newArray.length >= topping.free_choices) {
+    if(selectedOptions){
+        Object.keys(selectedOptions).forEach((key, index) => {
+            if (key === topping.name && Array.isArray(selectedOptions[key])) {
+              newArray = selectedOptions[key].filter((e) => e.name);
+              if (newArray.length >= topping.freeChoices) {
                 boolean = true;
               }
             }
@@ -331,8 +337,8 @@ export const ProductDetails = ({ addProductToCart }) => {
     }
 
     let selectedOptionIndex =
-      selectedToppings && Array.isArray(selectedToppings[topping.name]) &&
-      selectedToppings[topping.name].findIndex((e) => e.name === option.name);
+    selectedOptions && Array.isArray(selectedOptions[topping.name]) &&
+    selectedOptions[topping.name].findIndex((e) => e.name === option.name);
 
     console.log("OPTION ", option);
 
@@ -343,8 +349,8 @@ export const ProductDetails = ({ addProductToCart }) => {
     } else if (boolean && option.multiple) {
       return <Typography>{option.name + ` + ${option.price}`}</Typography>;
     } else if (
-       selectedToppings &&
-      !Array.isArray(selectedToppings[topping.name]) &&
+      selectedOptions &&
+      !Array.isArray(selectedOptions[topping.name]) &&
       option.price > 0
     ) {
       return <Typography>{option.name + ` + ${option.price}`}</Typography>;
@@ -354,20 +360,21 @@ export const ProductDetails = ({ addProductToCart }) => {
   };
 
   const renderToppingOption = (toppingIndex, optionIndex, topping, option) => {
+    console.log('OPTION OPTION ', option)
     const disabled = renderDisabled(topping, option);
     console.log("DISABLED ", disabled);
 
     // Check how many choices are already selected
     let newArrayEachOptionSelected = [];
     let newArrayAllOptionsSelected = [];
-    if (selectedToppings && Array.isArray(selectedToppings[topping.name])) {
-      newArrayAllOptionsSelected = selectedToppings[topping.name].filter(
+    if (selectedOptions && Array.isArray(selectedOptions[topping.name])) {
+      newArrayAllOptionsSelected = selectedOptions[topping.name].filter(
         (e) => e.name
       );
     }
 
-    if (selectedToppings && Array.isArray(selectedToppings[topping.name])) {
-      newArrayEachOptionSelected = selectedToppings[topping.name].filter(
+    if (selectedOptions && Array.isArray(selectedOptions[topping.name])) {
+      newArrayEachOptionSelected = selectedOptions[topping.name].filter(
         (e) => e.name === option.name
       );
     }
@@ -411,7 +418,7 @@ export const ProductDetails = ({ addProductToCart }) => {
                 incrementMultiple(toppingIndex, optionIndex, topping, option)
               }
               disabled={
-                topping.max_choices === newArrayAllOptionsSelected.length
+                topping.maxChoices === newArrayAllOptionsSelected.length
               }
             >
               <AddCircleOutlineIcon fontSize={"large"} />
@@ -427,36 +434,36 @@ export const ProductDetails = ({ addProductToCart }) => {
       <Box>
         <CardMedia
           component="img"
-          image={defaultData.picture}
+          image={defaultData.image}
           alt="Live from space album cover"
         />
         <Box p={5} mb={5}>
           <Typography variant="h2">{defaultData.name}</Typography>
           <Box>
-            {defaultData.toppings &&
-              defaultData.toppings.map((topping, toppingIndex) => (
+            {defaultData.options &&
+              defaultData.options.map((topping, toppingIndex) => (
                 <Box>
                   <Typography variant="h4" sx={{ marginTop: "12px" }}>
                     {topping.name}
                   </Typography>
                   <Typography variant="body2" sx={{ marginTop: "2px" }}>
-                    {topping.max_choices > 1
-                      ? `Up to ${topping.max_choices} choices `
-                      : `Up to ${topping.max_choices} choice `}
+                    {topping.maxChoices > 1
+                      ? `Up to ${topping.maxChoices} choices `
+                      : `Up to ${topping.maxChoices} choice `}
                   </Typography>
-                  {topping.free_choices > 0 ? (
+                  {topping.freeChoices > 0 ? (
                     <Typography
                       variant="body2"
                       sx={{ marginTop: "2px" }}
                       color="primary"
                     >
-                      {topping.free_choices > 1
-                        ? `The first ${topping.free_choices} are free`
-                        : `The first ${topping.free_choices} is free`}
+                      {topping.freeChoices > 1
+                        ? `The first ${topping.freeChoices} are free`
+                        : `The first ${topping.freeChoices} is free`}
                     </Typography>
                   ) : null}
                   <Box display="flex" flexDirection="column">
-                    {topping.product_toppings_options.map(
+                    {topping.choices.map(
                       (option, optionIndex) =>
                         renderToppingOption(
                           toppingIndex,

@@ -33,8 +33,8 @@ function App() {
   return (
     <HelmetProvider>
       <Helmet
-        titleTemplate="%s | Material App"
-        defaultTitle="Material App - React Admin & Dashboard Template"
+        titleTemplate="%s | Foody"
+        defaultTitle="Foody"
       />
       <Provider store={store}>
         <StylesProvider jss={jss}>

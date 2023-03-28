@@ -17,7 +17,7 @@ export default function Router() {
       element: <MainLayout />,
       children: [
         { path: "/", element: <NestedGrid /> },
-        { path: "restaurant/:id", element: <RestaurantDetails /> }
+        { path: "/:id", element: <RestaurantDetails /> }
       ]
     },
     {

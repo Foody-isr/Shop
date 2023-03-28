@@ -73,15 +73,22 @@ export const RestaurantDetails = () => {
   const desktop = useMediaQuery(theme.breakpoints.up("md"));
   const [orderDialog, setOrderDialog] = useState(false);
   const [cart, setCart] = useState([]);
+  console.log('CART ', cart)
   const [totalOrder, setTotalOrder] = useState(0);
   const [totalItemsOrder, setTotalItemsOrder] = useState(0);
   const dispatch = useDispatch();
-  const restaurantId = useParams().id;
+
+  const { id } = useParams();
+  console.log('restaurant ID ', id)
 
   const [categorySelected, setCategorySelected] = useState(null);
 
   const restaurant = useSelector(
     (state) => state.restaurants.restaurantDetails
+  );
+
+  const products = useSelector(
+    (state) => state.restaurants.products
   );
 
   const closed = useSelector(
@@ -91,7 +98,7 @@ export const RestaurantDetails = () => {
   console.log('RESTAURANT CLOSE', closed)
 
   useEffect(() => {
-    dispatch(fetchRestaurantDetails(restaurantId));
+    dispatch(fetchRestaurantDetails(id));
   }, []);
 
   console.log('CART CART CART CART CART', cart)
@@ -148,6 +155,7 @@ export const RestaurantDetails = () => {
   // }
 
   const addProductToCart = (result) => {
+    console.log('addProductToCart - result ', result)
     //   let cloneArray = [...cart];
     // //   console.log('CLONE ARRAY ', cloneArray)
     //   const resultArray = cloneArray.concat(arrayOfProducts);
@@ -225,15 +233,18 @@ export const RestaurantDetails = () => {
   }
 
   const openProductDialog = (product) => {
-    if(!user){
-      alert('You need to login')
-    }else{
+    // if(!user){
+    //   alert('You need to login')
+    // }else{
 
-        dispatch(
+    //     dispatch(
+    //       openSelectedProductDialog({ defaultData: product })
+    //     )
+
+    // }
+            dispatch(
           openSelectedProductDialog({ defaultData: product })
         )
-
-    }
   }
 
   const renderCategories = () => {
@@ -248,7 +259,7 @@ export const RestaurantDetails = () => {
           </div>
           <Box>
             <Grid container spacing={1}>
-              {restaurant.formated_products[category].map((product) => (
+              {products.map((product) => (
                 <Grid container item spacing={3}>
                   <Grid item xs>
                     <Card
@@ -293,9 +304,9 @@ export const RestaurantDetails = () => {
     });
   };
 
-  if (!restaurant.name) {
-    return <div>Loading</div>;
-  }
+  // if (!restaurant.name) {
+  //   return <div>Loading</div>;
+  // }
   return (
     <>
       <Container maxWidth={"false"}>
@@ -330,7 +341,7 @@ export const RestaurantDetails = () => {
       </Container>
       <SpacerTop />
 
-      <CategoriesContainer variant="elevation" square>
+      {/* <CategoriesContainer variant="elevation" square>
         <Container
           sx={{ display: "flex", flexDirection: "row", overflowX: "auto" }}
           maxWidth={"false"}
@@ -352,10 +363,51 @@ export const RestaurantDetails = () => {
             </CategoryLink>
           ))}
         </Container>
-      </CategoriesContainer>
+      </CategoriesContainer> */}
       <SpacerTop />
       <Container maxWidth={"false"}>
-        <Box mt={5}>{renderCategories()}</Box>
+      <Box mt={5}>
+            <Grid container spacing={1}>
+              {products.map((product) => (
+                <Grid container item spacing={3}>
+                  <Grid item xs>
+                    <Card
+                      onClick={() =>
+
+                          openProductDialog(product)
+
+                      }
+                      variant="outlined"
+                      sx={{
+                        display: "flex",
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        maxHeight: "150px",
+                        marginBottom: "10px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      <Box sx={{ padding: "10px" }}>
+                        <Typography variant="h5">{product.name}</Typography>
+                        <Typography mt={2} variant="body2">
+                          {product.description}
+                        </Typography>
+                        <Typography mt={2} variant="subtitle1">
+                          {product.price} ₪
+                        </Typography>
+                      </Box>
+                      <CardMedia
+                        component="img"
+                        sx={{ width: 200 }}
+                        image={product.image}
+                        alt="Live from space album cover"
+                      />
+                    </Card>
+                  </Grid>
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
       </Container>
       {cart.length > 0 ? (
         <Box sx={{ position: "sticky", bottom: 0 }}>

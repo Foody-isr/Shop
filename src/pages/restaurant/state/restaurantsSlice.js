@@ -10,6 +10,7 @@ const initialState = {
   customerDetails: {},
   closed: false,
   cities: [],
+  products: [],
 };
 
 export const restaurantsSlice = createSlice({
@@ -18,6 +19,9 @@ export const restaurantsSlice = createSlice({
   reducers: {
     restaurantsReceived(state, action) {
       state.restaurants = action.payload;
+    },
+    productsReceived(state, action) {
+      state.products = action.payload;
     },
     restaurantDetailsReceived(state, action){
       state.restaurantDetails = action.payload
@@ -37,6 +41,7 @@ export const restaurantsSlice = createSlice({
 // Action creators are generated for each case reducer function
 export const {
 restaurantsReceived,
+productsReceived,
 restaurantDetailsReceived,
 customerDetailsReceived,
 closedRestaurant,
@@ -54,16 +59,22 @@ export const splitArrayIntoChunksOfLen = (arr, len) => {
 }
 
 export const fetchRestaurants = () => async (dispatch) => {
-  const response = await axiosInstance.get('restaurant');
+  const response = await axiosInstance.get('/restaurant');
   const chunksOfThree = splitArrayIntoChunksOfLen(response.data, 3)
   console.log("CHUNKS ", chunksOfThree)
   dispatch(restaurantsReceived(chunksOfThree));
 };
 
 export const fetchRestaurantDetails = (id) => async (dispatch) => {
-    const response = await axiosInstance.get(`restaurant/${id}`);
-    dispatch(restaurantDetailsReceived(response.data));
-  };
+    const response = await axiosInstance.get(`/restaurant/${id}`)
+    dispatch(restaurantDetailsReceived(response.data[0]))
+    dispatch(fetchProducts(response.data[0].user));
+};
+
+export const fetchProducts = (id) => async (dispatch) => {
+  const response = await axiosInstance.get(`/product/shop/${id}`)
+  dispatch(productsReceived(response.data));
+};
 
 
 export const fetchAllCities = () => async (dispatch) => {

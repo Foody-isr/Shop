@@ -7,11 +7,13 @@ import {
   Dialog,
   FormControl,
   IconButton,
+  Input,
   InputLabel,
   MenuItem,
   Select,
   Typography,
 } from "@mui/material";
+import Autocomplete from "react-google-autocomplete";
 import React, { useEffect, useReducer, useState } from "react";
 import ReactWhatsapp from "react-whatsapp";
 import { NavLink } from "react-router-dom";
@@ -21,6 +23,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { closedRestaurant } from "./state/restaurantsSlice";
 import { ConstructionOutlined } from "@mui/icons-material";
 import { fetchUserDetails } from "../user/state/userSlice";
+import axios from "axios";
+import "./styles.css";
 
 export const OrderDialog = ({
   children,
@@ -37,19 +41,21 @@ export const OrderDialog = ({
   const [deliveryDate, setDeliveryDate] = useState("");
   const [deliveryAddress, setDeliveryAddress] = useState("");
   const [deliveryOptions, setDeliveryOptions] = useState([]);
-  const [closed, setClosed] = useState(false)
+  const [closed, setClosed] = useState(false);
 
   const dispatch = useDispatch();
 
-  const userDetails = useSelector(state => state.user.details)
+  console.log("RESTAURANT ", restaurant);
+  console.log("ORDER DIALOG - CART ", cart);
 
+  const userDetails = useSelector((state) => state.user.details);
 
   useEffect(() => {
     cart && setData(cart);
   }, [open]);
 
   useEffect(() => {
-    checkDeliveryArea()
+    checkDeliveryArea();
   }, [deliveryAddress]);
 
   useEffect(() => {
@@ -59,8 +65,8 @@ export const OrderDialog = ({
   }, [user]);
 
   useEffect(() => {
-    if (restaurant) {
-      restaurant.restaurant_times.forEach((time) => {
+    if (restaurant && restaurant.times) {
+      restaurant.times.forEach((time) => {
         console.log("RESTAURANT ", restaurant);
         const currentD = new Date();
         const openHours = new Date();
@@ -72,20 +78,20 @@ export const OrderDialog = ({
         openHours.setHours(start_hours, start_minutes, 0);
         closeHours.setHours(end_hours, end_minutes, 0);
 
-        console.log('RESTAURANT OPEN', openHours)
-        console.log('RESTAURANT CLOSE', closeHours)
-        console.log('RESTAURANT CURRENTD', currentD)
+        console.log("RESTAURANT OPEN", openHours);
+        console.log("RESTAURANT CLOSE", closeHours);
+        console.log("RESTAURANT CURRENTD", currentD);
 
         if (currentD >= openHours && currentD <= closeHours) {
-          dispatch(closedRestaurant(false))
+          dispatch(closedRestaurant(false));
 
           let deliveryStart = new Date();
           let deliveryEnd = new Date();
 
-          const start_hours = time.delivery_condition.start.split(":")[0];
-          const start_minutes = time.delivery_condition.start.split(":")[1];
-          const end_hours = time.delivery_condition.end.split(":")[0];
-          const end_minutes = time.delivery_condition.end.split(":")[1];
+          const start_hours = time.deliveryConditionStart.split(":")[0];
+          const start_minutes = time.deliveryConditionStart.split(":")[1];
+          const end_hours = time.deliveryConditionEnd.split(":")[0];
+          const end_minutes = time.deliveryConditionEnd.split(":")[1];
 
           deliveryStart.setHours(start_hours, start_minutes, 0);
           deliveryEnd.setHours(end_hours, end_minutes, 0);
@@ -100,35 +106,34 @@ export const OrderDialog = ({
           let options = [];
           let finalOptions = [];
           let today = new Date();
-          today.setDate(today.getDate() + parseInt(time.delivery_condition.day))
-          let date = today.getDate() + '-' + (today.getMonth()+1)+'-'+ today.getFullYear()
+          console.log("DELIVERY START ", deliveryStart);
+          today.setDate(today.getDate() + parseInt(time.deliveryConditionDay));
+          let date =
+            today.getDate() +
+            "-" +
+            (today.getMonth() + 1) +
+            "-" +
+            today.getFullYear();
 
           while (deliveryStart <= deliveryEnd) {
             let minutes = deliveryStart.getMinutes();
             if (minutes < 10) {
               minutes += "0";
             }
-            options.push(
-              deliveryStart.getHours() +
-              ":" +
-              minutes
-              );
+            options.push(deliveryStart.getHours() + ":" + minutes);
             deliveryStart.setMinutes(deliveryStart.getMinutes() + 30);
             // console.log("RESTAURANT WE DELIVERY ", deliveryStart.getTime());
           }
           console.log(options);
           for (let i = 0; i < options.length - 1; i++) {
             finalOptions.push(
-              date +
-              " at " +
-              options[i] +
-              "-" +
-              options[i + 1]);
+              date + " at " + options[i] + "-" + options[i + 1]
+            );
           }
           setDeliveryOptions(finalOptions);
-        }else {
-          console.log('RESTAURANT WE ARE CLOSED', currentD)
-          dispatch(closedRestaurant(true))
+        } else {
+          console.log("RESTAURANT WE ARE CLOSED", currentD);
+          dispatch(closedRestaurant(true));
         }
       });
     }
@@ -139,19 +144,24 @@ export const OrderDialog = ({
   );
 
   const checkDeliveryArea = () => {
-    if(deliveryAddress){
-      const found = restaurant && restaurant.cities.filter(city => city.name === deliveryAddress.city);
-      if(found.length === 0){
-        return (
-          <Box>
-            <Typography color='error'>Sorry we are not delivering to {deliveryAddress.city}</Typography>
-          </Box>
-        )
-      }
-      console.log('FOUND ', deliveryAddress)
-      console.log('FOUND ', found)
-    }
-  }
+    // if (deliveryAddress) {
+    //   const found =
+    //     restaurant &&
+    //     restaurant.cities.filter((city) => city.name === deliveryAddress.city);
+    //   if (found.length === 0) {
+    //     return (
+    //       <Box>
+    //         <Typography color="error">
+    //           Sorry we are not delivering to {deliveryAddress.city}
+    //         </Typography>
+    //       </Box>
+    //     );
+    //   }
+    //   console.log("FOUND ", deliveryAddress);
+    //   console.log("FOUND ", found);
+    // }
+    console.log("delivery address ", deliveryAddress);
+  };
 
   const renderUrlMessage = () => {
     let multipleToppingNames = [];
@@ -160,12 +170,12 @@ export const OrderDialog = ({
 
     data &&
       data.forEach((product) => {
-        product.toppings &&
-          Object.keys(product.toppings).map((key) => {
-            for (let i = 0; i < product.toppings[key].length; i++) {
+        product.options &&
+          Object.keys(product.options).map((key) => {
+            for (let i = 0; i < product.options[key].length; i++) {
               if (
-                product.toppings[key][i].name &&
-                product.toppings[key][i].multiple &&
+                product.options[key][i].name &&
+                product.options[key][i].multiple &&
                 !multipleToppingNames.includes(key)
               ) {
                 multipleToppingNames.push(key);
@@ -173,8 +183,11 @@ export const OrderDialog = ({
               }
             }
 
-            Array.isArray(product.toppings[key]) &&
-              product.toppings[key].forEach((topping) => {
+            console.log("product.options  ", product.options[key]);
+
+            Array.isArray(product.options[key]) &&
+              product.options[key].forEach((topping) => {
+                console.log("TOPPING  ", topping);
                 if (!multipleToppingOptionNames.includes(topping.name)) {
                   //   console.log("MULTIPLE TRUE ", topping.name);
                   if (topping.name && topping.multiple) {
@@ -183,7 +196,7 @@ export const OrderDialog = ({
                 }
               });
 
-            if (Array.isArray(product.toppings[key])) {
+            if (Array.isArray(product.options[key])) {
               // if(multipleToppingOptionNames.length > 0){
               //     multipleToppingOptionNames.forEach((name) => {
               //         const filteredArray = product.toppings[key].filter((e) => e.name === name);
@@ -202,7 +215,7 @@ export const OrderDialog = ({
               //       });
               // }
               //   console.log("PRODUCT PRODUCT PRODUCT ", product.id);
-              product.toppings[key].forEach((option) => {
+              product.options[key].forEach((option) => {
                 // console.log("OPTION OPTION OPTION ", option.name && option.name);
 
                 // Search if option with same name and same produt id already exist
@@ -336,12 +349,12 @@ export const OrderDialog = ({
         message += item.name + " ";
         message += "*" + item.count + " =";
         message += " " + item.total + "%0a";
-        if (item.toppings) {
-          if (Object.keys(item.toppings).length > 0) {
+        if (item.options) {
+          if (Object.keys(item.options).length > 0) {
             // message += JSON.stringify(item.toppings) + "%0a"
-            Object.keys(item.toppings).forEach((key) => {
+            Object.keys(item.options).forEach((key) => {
               message += "  " + key + " :" + "%0a";
-              if (Array.isArray(item.toppings[key])) {
+              if (Array.isArray(item.options[key])) {
                 if (multipleToppingNames.includes(key)) {
                   //   console.log("ITEM ID ", item.id);
                   //   const index = multipleToppingOptionArray.findIndex(
@@ -364,7 +377,7 @@ export const OrderDialog = ({
                     }
                   });
                 } else {
-                  item.toppings[key].forEach((e, index) => {
+                  item.options[key].forEach((e, index) => {
                     if (e.name) {
                       //   if (index == item.toppings[key].length - 1) {
                       //     message += "    " + e.name;
@@ -378,7 +391,7 @@ export const OrderDialog = ({
                   //   message += "%0a";
                 }
               } else {
-                message += "    " + item.toppings[key].name + "%0a";
+                message += "    " + item.options[key].name + "%0a";
               }
             });
           }
@@ -412,14 +425,14 @@ export const OrderDialog = ({
 
   const renderMultipleTopping = (
     multipleToppingNames,
-    toppings,
+    options,
     key,
     multipleToppingOptionNames
   ) => {
     let multipleToppingOptionArray = [];
 
     multipleToppingOptionNames.forEach((name) => {
-      const filteredArray = toppings.filter((e) => e.name === name);
+      const filteredArray = options.filter((e) => e.name === name);
       multipleToppingOptionArray.push({
         name: name,
         count: filteredArray.length,
@@ -438,7 +451,7 @@ export const OrderDialog = ({
         </Box>
       ));
     } else {
-      return toppings.map((topping) => {
+      return options.map((topping) => {
         if (topping.name && !topping.multiple) {
           return <Typography ml={1}>{topping.name}</Typography>;
         }
@@ -456,10 +469,10 @@ export const OrderDialog = ({
     // Format multiple toppings
 
     return (
-      product.toppings &&
-      Object.keys(product.toppings).map((key) => {
+      product.options &&
+      Object.keys(product.options).map((key) => {
         console.log(key);
-        console.log(product.toppings[key]);
+        console.log(product.options[key]);
 
         // Filter multiple topping
 
@@ -468,18 +481,18 @@ export const OrderDialog = ({
         let multipleToppingNames = [];
         let multipleToppingOptionNames = [];
 
-        for (let i = 0; i < product.toppings[key].length; i++) {
+        for (let i = 0; i < product.options[key].length; i++) {
           if (
-            product.toppings[key][i].name &&
-            product.toppings[key][i].multiple
+            product.options[key][i].name &&
+            product.options[key][i].multiple
           ) {
             multipleToppingNames.push(key);
             break;
           }
         }
 
-        Array.isArray(product.toppings[key]) &&
-          product.toppings[key].forEach((topping) => {
+        Array.isArray(product.options[key]) &&
+          product.options[key].forEach((topping) => {
             if (!multipleToppingOptionNames.includes(topping.name)) {
               if (topping.name && topping.multiple) {
                 multipleToppingOptionNames.push(topping.name);
@@ -495,7 +508,7 @@ export const OrderDialog = ({
 
         //Create array of object of topping mutiple with count
 
-        if (Array.isArray(product.toppings[key])) {
+        if (Array.isArray(product.options[key])) {
           return (
             <Box display="flex">
               <Typography>{key + " : "}</Typography>
@@ -503,7 +516,7 @@ export const OrderDialog = ({
               <Typography ml={1} display="flex" flexDirection="row">
                 {renderMultipleTopping(
                   multipleToppingNames,
-                  product.toppings[key],
+                  product.options[key],
                   key,
                   multipleToppingOptionNames
                 )}
@@ -512,7 +525,7 @@ export const OrderDialog = ({
           );
         } else {
           return (
-            <Typography>{key + " : " + product.toppings[key].name}</Typography>
+            <Typography>{key + " : " + product.options[key].name}</Typography>
           );
         }
       })
@@ -522,6 +535,16 @@ export const OrderDialog = ({
   if (!customerDetails) {
     return <div>Loading...</div>;
   }
+
+  const sendOrder = async () => {
+    // const response = await axios.post("http://localhost:8000/order", {});
+    // console.log("response ", response);
+    window.location.replace(
+      "https://payments.payplus.co.il/a8344bf1-c85e-4300-a5c6-11dc8e9d1be0"
+    );
+
+    //AIzaSyCMf3e-EcZAKTg6qtatJ5e_zAFE-bRmvq4
+  };
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth>
@@ -569,7 +592,7 @@ export const OrderDialog = ({
                 <CardMedia
                   component="img"
                   sx={{ width: 100 }}
-                  image={product.picture}
+                  image={product.image}
                   alt="Live from space album cover"
                 />
               </Box>
@@ -581,21 +604,40 @@ export const OrderDialog = ({
           <InputLabel id="demo-simple-select-label">
             Choose delivery address
           </InputLabel>
-          <Select
+          {/* <Select
             labelId="demo-simple-select-label"
             id="demo-simple-select"
             value={deliveryAddress}
             label="Choose delivery address"
             onChange={(e) => setDeliveryAddress(e.target.value)}
           >
-            {userDetails.addresses && userDetails.addresses.map((option) => (
-              <MenuItem value={option}>{option.name} - {option.address} - {option.city}</MenuItem>
-            ))}
-          </Select>
+            {userDetails.addresses &&
+              userDetails.addresses.map((option) => (
+                <MenuItem value={option}>
+                  {option.name} - {option.address} - {option.city}
+                </MenuItem>
+              ))}
+          </Select> */}
+          <Select
+            labelId="demo-simple-select-label"
+            label="Choose delivery address"
+            value={deliveryAddress.formatted_address}
+            inputComponent={({ inputRef, onFocus, onBlur, ...props }) => (
+              <Autocomplete
+                apiKey={"AIzaSyCMf3e-EcZAKTg6qtatJ5e_zAFE-bRmvq4"}
+                {...props}
+                onPlaceSelected={(place) => {
+                  setDeliveryAddress(place);
+                }}
+                options={{
+                  componentRestrictions: { country: "il" },
+                  types: ["address"],
+                }}
+              />
+            )}
+          />
         </FormControl>
-        {
-          checkDeliveryArea()
-        }
+        {checkDeliveryArea()}
       </Box>
       <Box m={3}>
         <FormControl fullWidth>
@@ -616,9 +658,12 @@ export const OrderDialog = ({
         </FormControl>
       </Box>
       <Box m={3} display="flex" flexDirection="row" justifyContent="center">
-        <a href={renderUrlMessage()}>
+        {/* <a href={renderUrlMessage()}>
           <Button variant="contained">Order on Whatsapp</Button>
-        </a>
+        </a> */}
+        <Button onClick={sendOrder} variant="contained">
+          Order on Whatsapp
+        </Button>
       </Box>
     </Dialog>
   );
