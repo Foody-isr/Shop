@@ -506,7 +506,7 @@ export const OrderDialog = ({
         //   multipleToppingOptionNames
         // );
 
-        //Create array of object of topping mutiple with count
+        //Create array of object of topping mutiple with count.
 
         if (Array.isArray(product.options[key])) {
           return (
