@@ -1,12 +1,11 @@
 import axios from "axios";
 
-
 const baseURL = process.env.REACT_APP_BASE_API_URL;
 
-console.log('BASE URL ', baseURL)
+console.log("BASE URL ", baseURL);
 const axiosInstance = axios.create({
   baseURL,
-//   withCredentials: true
+  //   withCredentials: true
 });
 
 // axiosInstance.interceptors.request.use(function (config) {

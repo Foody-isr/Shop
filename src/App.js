@@ -1,16 +1,13 @@
 import * as React from "react";
 import {
   StyledEngineProvider,
-  ThemeProvider as MuiThemeProvider,
+  ThemeProvider,
+  useTheme,
 } from "@mui/material/styles";
-import { ThemeProvider } from "styled-components/macro";
 import { AuthProvider } from "./contexts/JWTContext";
-import { useTheme } from "@mui/material/styles";
 import { Provider, useDispatch, useSelector } from "react-redux";
 import { store } from "./store";
 import Router from "./routes";
-import AdapterDateFns from "@mui/lab/AdapterDateFns";
-import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import jssPreset from "@mui/styles/jssPreset";
 import { create } from "jss";
@@ -32,25 +29,18 @@ function App() {
 
   return (
     <HelmetProvider>
-      <Helmet
-        titleTemplate="%s | Foody"
-        defaultTitle="Foody"
-      />
+      <Helmet titleTemplate="%s | Foody" defaultTitle="Foody" />
       <Provider store={store}>
         <StylesProvider jss={jss}>
-          <LocalizationProvider dateAdapter={AdapterDateFns}>
-            <StyledEngineProvider injectFirst>
-              <MuiThemeProvider theme={createTheme(theme)}>
-                <ThemeProvider theme={createTheme(theme)}>
-                  <AuthProvider>
-                    <Suspense fallback={<Loader />}>
-                      <Router />
-                    </Suspense>
-                  </AuthProvider>
-                </ThemeProvider>
-              </MuiThemeProvider>
-            </StyledEngineProvider>
-          </LocalizationProvider>
+          <StyledEngineProvider injectFirst>
+            <ThemeProvider theme={theme}>
+              <AuthProvider>
+                <Suspense fallback={<Loader />}>
+                  <Router />
+                </Suspense>
+              </AuthProvider>
+            </ThemeProvider>
+          </StyledEngineProvider>
         </StylesProvider>
       </Provider>
     </HelmetProvider>

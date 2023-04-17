@@ -65,7 +65,7 @@ const CategoryLink = styled.a`
 // `;
 
 export const RestaurantDetails = () => {
-  const { user } = useAuth()
+  const { user } = useAuth();
   const navigate = useNavigate();
   const theme = useTheme();
   const mobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -73,13 +73,13 @@ export const RestaurantDetails = () => {
   const desktop = useMediaQuery(theme.breakpoints.up("md"));
   const [orderDialog, setOrderDialog] = useState(false);
   const [cart, setCart] = useState([]);
-  console.log('CART ', cart)
+  console.log("CART ", cart);
   const [totalOrder, setTotalOrder] = useState(0);
   const [totalItemsOrder, setTotalItemsOrder] = useState(0);
   const dispatch = useDispatch();
 
   const { id } = useParams();
-  console.log('restaurant ID ', id)
+  console.log("restaurant ID ", id);
 
   const [categorySelected, setCategorySelected] = useState(null);
 
@@ -87,21 +87,18 @@ export const RestaurantDetails = () => {
     (state) => state.restaurants.restaurantDetails
   );
 
-  const products = useSelector(
-    (state) => state.restaurants.products
-  );
+  const products = useSelector((state) => state.restaurants.products);
 
-  const closed = useSelector(
-    (state) => state.restaurants.closed
-  );
+  const closed = useSelector((state) => state.restaurants.closed);
 
-  console.log('RESTAURANT CLOSE', closed)
+  console.log("RESTAURANT CLOSE", closed);
 
   useEffect(() => {
+    console.log("RESTAURANT DETAILS ID ", id);
     dispatch(fetchRestaurantDetails(id));
   }, []);
 
-  console.log('CART CART CART CART CART', cart)
+  console.log("CART CART CART CART CART", cart);
 
   useEffect(() => {
     let resultTotal = 0;
@@ -155,7 +152,7 @@ export const RestaurantDetails = () => {
   // }
 
   const addProductToCart = (result) => {
-    console.log('addProductToCart - result ', result)
+    console.log("addProductToCart - result ", result);
     //   let cloneArray = [...cart];
     // //   console.log('CLONE ARRAY ', cloneArray)
     //   const resultArray = cloneArray.concat(arrayOfProducts);
@@ -171,16 +168,16 @@ export const RestaurantDetails = () => {
 
     if (cloneArray.length > 0) {
       console.log(" > 0 ");
-      const index = cloneArray.findIndex(e => e.name === result.name);
-      if(index != -1){
+      const index = cloneArray.findIndex((e) => e.name === result.name);
+      if (index != -1) {
         if (compareObjectsOrder(cloneArray[index], result)) {
           console.log("EQUAL");
           cloneArray[index].count += result.count;
           cloneArray[index].total += parseInt(result.total);
-        }else{
+        } else {
           cloneArray.push(result);
         }
-      }else{
+      } else {
         cloneArray.push(result);
       }
       // cloneArray.forEach((product) => {
@@ -205,32 +202,28 @@ export const RestaurantDetails = () => {
   };
 
   const decrementProduct = (product) => {
+    console.log("DECREMENT PRODUCT");
 
-    console.log('DECREMENT PRODUCT')
-
-    let cloneArray  = [...cart];
-    const index = cloneArray.findIndex(e => e.name === product.name);
-    if(index != -1){
+    let cloneArray = [...cart];
+    const index = cloneArray.findIndex((e) => e.name === product.name);
+    if (index != -1) {
       cloneArray[index].count -= 1;
       cloneArray[index].total -= parseInt(product.price);
-      setCart(cloneArray)
+      setCart(cloneArray);
     }
-
-  }
+  };
 
   const incrementProduct = (product) => {
+    console.log("INCREMENT PRODUCT");
 
-    console.log('INCREMENT PRODUCT')
-
-    let cloneArray  = [...cart];
-    const index = cloneArray.findIndex(e => e.name === product.name);
-    if(index != -1){
+    let cloneArray = [...cart];
+    const index = cloneArray.findIndex((e) => e.name === product.name);
+    if (index != -1) {
       cloneArray[index].count += 1;
       cloneArray[index].total += parseInt(product.price);
-      setCart(cloneArray)
+      setCart(cloneArray);
     }
-
-  }
+  };
 
   const openProductDialog = (product) => {
     // if(!user){
@@ -242,10 +235,8 @@ export const RestaurantDetails = () => {
     //     )
 
     // }
-            dispatch(
-          openSelectedProductDialog({ defaultData: product })
-        )
-  }
+    dispatch(openSelectedProductDialog({ defaultData: product }));
+  };
 
   const renderCategories = () => {
     return Object.keys(restaurant.formated_products).map((category) => {
@@ -263,11 +254,7 @@ export const RestaurantDetails = () => {
                 <Grid container item spacing={3}>
                   <Grid item xs>
                     <Card
-                      onClick={() =>
-
-                          openProductDialog(product)
-
-                      }
+                      onClick={() => openProductDialog(product)}
                       variant="outlined"
                       sx={{
                         display: "flex",
@@ -321,7 +308,6 @@ export const RestaurantDetails = () => {
         />
         <ProductDetails
           addProductToCart={(product) => addProductToCart(product)}
-
         />
         <Box
           sx={
@@ -366,48 +352,44 @@ export const RestaurantDetails = () => {
       </CategoriesContainer> */}
       <SpacerTop />
       <Container maxWidth={"false"}>
-      <Box mt={5}>
-            <Grid container spacing={1}>
-              {products.map((product) => (
-                <Grid container item spacing={3}>
-                  <Grid item xs>
-                    <Card
-                      onClick={() =>
-
-                          openProductDialog(product)
-
-                      }
-                      variant="outlined"
-                      sx={{
-                        display: "flex",
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                        maxHeight: "150px",
-                        marginBottom: "10px",
-                        cursor: "pointer",
-                      }}
-                    >
-                      <Box sx={{ padding: "10px" }}>
-                        <Typography variant="h5">{product.name}</Typography>
-                        <Typography mt={2} variant="body2">
-                          {product.description}
-                        </Typography>
-                        <Typography mt={2} variant="subtitle1">
-                          {product.price} ₪
-                        </Typography>
-                      </Box>
-                      <CardMedia
-                        component="img"
-                        sx={{ width: 200 }}
-                        image={product.image}
-                        alt="Live from space album cover"
-                      />
-                    </Card>
-                  </Grid>
+        <Box mt={5}>
+          <Grid container spacing={1}>
+            {products.map((product) => (
+              <Grid container item spacing={3}>
+                <Grid item xs>
+                  <Card
+                    onClick={() => openProductDialog(product)}
+                    variant="outlined"
+                    sx={{
+                      display: "flex",
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      maxHeight: "150px",
+                      marginBottom: "10px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <Box sx={{ padding: "10px" }}>
+                      <Typography variant="h5">{product.name}</Typography>
+                      <Typography mt={2} variant="body2">
+                        {product.description}
+                      </Typography>
+                      <Typography mt={2} variant="subtitle1">
+                        {product.price} ₪
+                      </Typography>
+                    </Box>
+                    <CardMedia
+                      component="img"
+                      sx={{ width: 200 }}
+                      image={product.image}
+                      alt="Live from space album cover"
+                    />
+                  </Card>
                 </Grid>
-              ))}
-            </Grid>
-          </Box>
+              </Grid>
+            ))}
+          </Grid>
+        </Box>
       </Container>
       {cart.length > 0 ? (
         <Box sx={{ position: "sticky", bottom: 0 }}>

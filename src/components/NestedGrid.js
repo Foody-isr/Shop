@@ -36,7 +36,7 @@ function FormRow(restaurantByThree) {
       {restaurantByThree.restaurantByThree.map((restaurant) => (
         <Grid item xs>
           <NavLink to={`/restaurant/${restaurant.restaurantId}`}>
-            <Box maxWidth={'400px'} mb={10}>
+            <Box maxWidth={"400px"} mb={10}>
               <Card variant="outlined">
                 <CardMedia
                   component="img"
@@ -74,19 +74,20 @@ export default function NestedGrid() {
     <Box sx={{ flexGrow: 1 }}>
       <Spacer />
       <Container>
-      <Typography variant="h1">Restaurants</Typography>
-      <Spacer />
+        <Typography variant="h1">Restaurants</Typography>
+        <Spacer />
+        <h1>Restaurants</h1>
         <Grid container spacing={1}>
-            {restaurantsArray.map((restaurantByThree) => (
+          {restaurantsArray.map((restaurantByThree) => (
             <Grid
-                container
-                item
-                spacing={5}
-                direction={desktop ? "row" : "column"}
+              container
+              item
+              spacing={5}
+              direction={desktop ? "row" : "column"}
             >
-                <FormRow restaurantByThree={restaurantByThree} />
+              <FormRow restaurantByThree={restaurantByThree} />
             </Grid>
-            ))}
+          ))}
         </Grid>
       </Container>
     </Box>

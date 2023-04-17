@@ -11,22 +11,23 @@ import { Addresses } from "./pages/user/Addresses";
 import { SignUp } from "./pages/auth/SignUp";
 
 export default function Router() {
+  console.log("ROUTER ");
 
   let element = useRoutes([
     {
       element: <MainLayout />,
       children: [
         { path: "/", element: <NestedGrid /> },
-        { path: "/:id", element: <RestaurantDetails /> }
-      ]
+        { path: "/:id", element: <RestaurantDetails /> },
+      ],
     },
     {
       path: "/auth",
       element: <MainLayout />,
       children: [
         { path: "signin", element: <SignIn /> },
-        { path: "signup", element: <SignUp /> }
-      ]
+        { path: "signup", element: <SignUp /> },
+      ],
     },
     {
       path: "/user",
@@ -38,20 +39,20 @@ export default function Router() {
           children: [
             {
               path: "overview",
-              element: <Overview />
+              element: <Overview />,
             },
             {
               path: "payment_methods",
-              element: <PaymentMethods />
+              element: <PaymentMethods />,
             },
             {
               path: "my_addresses",
-              element: <Addresses />
-            }
-          ]
-       }
-      ]
-    }
+              element: <Addresses />,
+            },
+          ],
+        },
+      ],
+    },
   ]);
 
   return element;
