@@ -20,7 +20,7 @@ const settings = ["Profile", "Account", "Dashboard", "Logout"];
 const ResponsiveAppBar = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
-  console.log('USER ', user);
+  console.log("USER ", user);
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
 
@@ -32,22 +32,21 @@ const ResponsiveAppBar = () => {
   };
 
   const handleCloseNavMenu = async (page) => {
-    console.log('page' ,page)
-    if(page === 'Restaurants'){
-      navigate('/')
+    console.log("page", page);
+    if (page === "Restaurants") {
+      navigate("/");
       setAnchorElNav(null);
     }
   };
 
   const handleCloseUserMenu = async (setting) => {
-    if(setting === 'Logout'){
-      await signOut()
+    if (setting === "Logout") {
+      await signOut();
       setAnchorElUser(null);
-      navigate('/')
-    }
-    else if(setting === 'Profile'){
+      navigate("/");
+    } else if (setting === "Profile") {
       setAnchorElUser(null);
-      navigate('/user/profile/overview')
+      navigate("/user/profile/overview");
     }
     setAnchorElUser(null);
   };
@@ -128,7 +127,11 @@ const ResponsiveAppBar = () => {
                   <Avatar>{user.first_name && user.first_name[0]}</Avatar>
                 </IconButton>
               ) : (
-                <NavLink to={'/auth/signin'}>
+                <NavLink
+                  to={
+                    "https://auth.foody-app.co/oauth2/authorize?client_id=341mclabt5p0437nm1rcqo0rl7&response_type=code&scope=email+openid+phone&redirect_uri=https%3A%2F%2Ffoody-shop.netlify.app"
+                  }
+                >
                   Login
                 </NavLink>
               )}
@@ -150,7 +153,10 @@ const ResponsiveAppBar = () => {
               onClose={handleCloseUserMenu}
             >
               {settings.map((setting) => (
-                <MenuItem key={setting} onClick={() => handleCloseUserMenu(setting)}>
+                <MenuItem
+                  key={setting}
+                  onClick={() => handleCloseUserMenu(setting)}
+                >
                   <Typography textAlign="center">{setting}</Typography>
                 </MenuItem>
               ))}
