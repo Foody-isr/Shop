@@ -1,4 +1,6 @@
 import * as React from "react";
+import { Amplify, Auth, Hub } from "aws-amplify";
+import { CognitoHostedUIIdentityProvider } from "@aws-amplify/auth";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -121,7 +123,7 @@ const ResponsiveAppBar = () => {
           </Box>
 
           <Box sx={{ flexGrow: 0 }}>
-            <Tooltip title="Open settings">
+            {/* <Tooltip title="Open settings">
               {user ? (
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                   <Avatar>{user.first_name && user.first_name[0]}</Avatar>
@@ -129,13 +131,22 @@ const ResponsiveAppBar = () => {
               ) : (
                 <NavLink
                   to={
-                    "https://auth.foody-app.co/oauth2/authorize?client_id=341mclabt5p0437nm1rcqo0rl7&response_type=code&scope=email+openid+phone&redirect_uri=https%3A%2F%2Ffoody-shop.netlify.app"
+                    "https://auth.foody-app.co/oauth2/authorize?client_id=341mclabt5p0437nm1rcqo0rl7&response_type=token&scope=email+openid+phone&redirect_uri=https%3A%2F%2Fshop.foody-app.co"
                   }
                 >
                   Login
                 </NavLink>
               )}
-            </Tooltip>
+            </Tooltip> */}
+            <button
+              onClick={() =>
+                Auth.federatedSignIn({
+                  provider: CognitoHostedUIIdentityProvider.Google,
+                })
+              }
+            >
+              Open Google
+            </button>
             <Menu
               sx={{ mt: "45px" }}
               id="menu-appbar"
