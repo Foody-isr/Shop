@@ -104,12 +104,15 @@ export function AuthProvider({ children }) {
               reject(error);
               console.error(error);
             }
-            const attributes = cognitoUser.attributes;
-            console.log("USER ATTRIBUTES ", attributes);
+            // const attributes = cognitoUser.attributes;
             console.log("session", session);
             const accessToken = session?.getAccessToken().getJwtToken();
             // console.log("accessToken", accessToken);
             const token = session?.getIdToken().getJwtToken();
+            const attributes = session?.getIdToken().payload;
+            console.log("USER ATTRIBUTES ", attributes);
+
+            console.log("ID TOKEN ", token);
             // console.log("PAYLOAD ", payload);
 
             // use the token or Bearer depend on the wait BE handle, by default amplify API only need to token.
