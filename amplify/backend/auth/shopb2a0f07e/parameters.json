@@ -13,5 +13,8 @@
   "passwordPolicyMinLength": 8,
   "passwordPolicyCharacters": [],
   "mfaConfiguration": "OFF",
+  "autoVerifiedAttributes": [
+    "phone_number"
+  ],
   "mfaTypes": []
 }
