@@ -9,13 +9,16 @@ import { store } from "./store";
 import { AuthProvider } from "./auth/AwsCognitoContext";
 
 import { createRoot } from "react-dom/client";
+import { Authenticator } from "@aws-amplify/ui-react";
 const container = document.getElementById("root");
 const root = createRoot(container);
 root.render(
   <AuthProvider>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <Authenticator.Provider>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </Authenticator.Provider>
   </AuthProvider>
 );
 

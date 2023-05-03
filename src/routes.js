@@ -11,8 +11,6 @@ import { Addresses } from "./pages/user/Addresses";
 import { SignUp } from "./pages/auth/SignUp";
 
 export default function Router() {
-  console.log("ROUTER ");
-
   let element = useRoutes([
     {
       element: <MainLayout />,

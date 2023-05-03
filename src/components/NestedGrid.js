@@ -30,7 +30,7 @@ const Spacer = styled.div`
 `;
 
 function FormRow(restaurantByThree) {
-  console.log("CHUNK OF THREE", restaurantByThree);
+  // console.log("CHUNK OF THREE", restaurantByThree);
   return (
     <React.Fragment>
       {restaurantByThree.restaurantByThree.map((restaurant) => (
@@ -61,10 +61,10 @@ export default function NestedGrid() {
   const desktop = useMediaQuery(theme.breakpoints.up("sm"));
   const dispatch = useDispatch();
 
-  React.useEffect(() => {
-    console.log("NESTED GRID");
-    dispatch(fetchRestaurants());
-  }, []);
+  // React.useEffect(() => {
+  //   console.log("NESTED GRID");
+  //   dispatch(fetchRestaurants());
+  // }, []);
 
   const restaurantsArray = useSelector(
     (state) => state.restaurants.restaurants

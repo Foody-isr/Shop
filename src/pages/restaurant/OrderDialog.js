@@ -18,13 +18,15 @@ import React, { useEffect, useReducer, useState } from "react";
 import ReactWhatsapp from "react-whatsapp";
 import { NavLink } from "react-router-dom";
 import _ from "lodash";
-import useAuth from "../../hooks/useAuth";
+// import useAuth from "../../hooks/useAuth";
 import { useDispatch, useSelector } from "react-redux";
 import { closedRestaurant } from "./state/restaurantsSlice";
 import { ConstructionOutlined } from "@mui/icons-material";
 import { fetchUserDetails } from "../user/state/userSlice";
 import axios from "axios";
 import "./styles.css";
+import { createOrder } from "../order/state/orderSlice";
+import { useAuthContext } from "../../auth/useAuthContext";
 
 export const OrderDialog = ({
   children,
@@ -36,7 +38,9 @@ export const OrderDialog = ({
   total,
   restaurant,
 }) => {
-  const { user } = useAuth();
+  // const { user } = useAuth();
+  // const { user, signOut } = useAuthenticator((context) => [context.user]);
+  const { user } = useAuthContext();
   const [data, setData] = useState([]);
   const [deliveryDate, setDeliveryDate] = useState("");
   const [deliveryAddress, setDeliveryAddress] = useState("");
@@ -45,7 +49,6 @@ export const OrderDialog = ({
 
   const dispatch = useDispatch();
 
-  console.log("RESTAURANT ", restaurant);
   console.log("ORDER DIALOG - CART ", cart);
 
   const userDetails = useSelector((state) => state.user.details);
@@ -58,11 +61,11 @@ export const OrderDialog = ({
     checkDeliveryArea();
   }, [deliveryAddress]);
 
-  useEffect(() => {
-    if (user) {
-      dispatch(fetchUserDetails(user));
-    }
-  }, [user]);
+  // useEffect(() => {
+  //   if (user) {
+  //     dispatch(fetchUserDetails(user));
+  //   }
+  // }, [user]);
 
   useEffect(() => {
     if (restaurant && restaurant.times) {
@@ -402,16 +405,16 @@ export const OrderDialog = ({
     if (total) {
       message += "Total : " + total;
     }
-    if (user && deliveryAddress && userDetails) {
-      message += "%0a";
-      message += "%0a";
-      message += user.first_name + " " + user.last_name + "%0a";
-      message += deliveryAddress.city + "%0a";
-      message += deliveryAddress.address + "%0a";
-      message += deliveryAddress.floor + "%0a";
-      message += deliveryAddress.appartment + "%0a";
-      message += userDetails.phone + "%0a";
-    }
+    // if (user && deliveryAddress && userDetails) {
+    //   message += "%0a";
+    //   message += "%0a";
+    //   message += user.first_name + " " + user.last_name + "%0a";
+    //   message += deliveryAddress.city + "%0a";
+    //   message += deliveryAddress.address + "%0a";
+    //   message += deliveryAddress.floor + "%0a";
+    //   message += deliveryAddress.appartment + "%0a";
+    //   message += userDetails.phone + "%0a";
+    // }
     message += "Delivery Date : " + deliveryDate;
 
     console.log("PHONE ", restaurant.phone);
@@ -537,13 +540,18 @@ export const OrderDialog = ({
   }
 
   const sendOrder = async () => {
-    // const response = await axios.post("http://localhost:8000/order", {});
-    // console.log("response ", response);
-    window.location.replace(
-      "https://payments.payplus.co.il/a8344bf1-c85e-4300-a5c6-11dc8e9d1be0"
-    );
-
-    //AIzaSyCMf3e-EcZAKTg6qtatJ5e_zAFE-bRmvq4
+    // console.log("RESTAURANT ", restaurant);
+    // dispatch(
+    //   createOrder(
+    //     data,
+    //     restaurant.user,
+    //     user.sub,
+    //     deliveryAddress.formatted_address,
+    //     user.name,
+    //     deliveryDate
+    //   )
+    // );
+    window.location.href = renderUrlMessage();
   };
 
   return (

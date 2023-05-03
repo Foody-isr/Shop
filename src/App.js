@@ -9,7 +9,7 @@ import {
   useTheme,
 } from "@mui/material/styles";
 import { AuthProvider } from "./contexts/JWTContext";
-import { Provider, useDispatch, useSelector } from "react-redux";
+import { Provider } from "react-redux";
 import { store } from "./store";
 import Router from "./routes";
 import { Helmet, HelmetProvider } from "react-helmet-async";
@@ -20,6 +20,8 @@ import { Suspense } from "react";
 import createTheme from "./theme";
 
 import Loader from "./components/Loader";
+import { Dialog } from "@mui/material";
+import { closeModal } from "./pages/auth/state/authSlice";
 
 const jss = create({
   ...jssPreset(),
@@ -30,8 +32,43 @@ Amplify.configure(awsExports);
 
 function App() {
   const theme = useTheme();
+  // console.log("URL ", window.location.href);
 
-  console.log("USE THEME ", theme);
+  // React.useEffect(() => {
+  //   const restaurantId = window.location.href.substring(
+  //     window.location.href.lastIndexOf("/") + 1
+  //   );
+  //   localStorage.setItem("restaurandId", restaurantId);
+  // }, []);
+
+  // React.useEffect(() => {
+  //   const restaurantId = window.location.href.substring(
+  //     window.location.href.lastIndexOf("/") + 1
+  //   );
+  //   console.log("RESTAURANT ID SET", restaurantId);
+  //   console.log(
+  //     "RESTAURANT ID LOCAL STORAGE ",
+  //     localStorage.getItem("restaurantId")
+  //   );
+  //   if (
+  //     localStorage.getItem("restaurantId") &&
+  //     localStorage.getItem("restaurantId").length > 1
+  //   ) {
+  //   } else {
+  //     localStorage.setItem("restaurantId", restaurantId);
+  //   }
+  // }, []);
+
+  // React.useEffect(() => {
+  //   if (
+  //     window.location.href.includes("logged") ||
+  //     window.location.href.includes("logout")
+  //   ) {
+  //     window.location.replace(
+  //       `http://localhost:3000/${localStorage.getItem("restaurantId")}`
+  //     );
+  //   }
+  // }, []);
 
   return (
     <HelmetProvider>
@@ -40,19 +77,9 @@ function App() {
         <StylesProvider jss={jss}>
           <StyledEngineProvider injectFirst>
             <ThemeProvider theme={theme}>
-              <AuthProvider>
-                <Suspense fallback={<Loader />}>
-                  {/* <Router /> */}
-                  <Authenticator>
-                    {({ signOut, user }) => (
-                      <main>
-                        <h1>Hello {user.username}</h1>
-                        <button onClick={signOut}>Sign out</button>
-                      </main>
-                    )}
-                  </Authenticator>
-                </Suspense>
-              </AuthProvider>
+              <Suspense fallback={<Loader />}>
+                <Router />
+              </Suspense>
             </ThemeProvider>
           </StyledEngineProvider>
         </StylesProvider>

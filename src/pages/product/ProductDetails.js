@@ -13,7 +13,10 @@ import {
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { closeSelectedProductDialog, resetSelectedProductDialog } from "./state/productSlice";
+import {
+  closeSelectedProductDialog,
+  resetSelectedProductDialog,
+} from "./state/productSlice";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import { set } from "date-fns";
@@ -23,7 +26,7 @@ import {
   IndeterminateCheckBoxTwoTone,
 } from "@mui/icons-material";
 import { useTheme } from "@mui/styles";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 export const ProductDetails = ({ addProductToCart }) => {
   const theme = useTheme();
@@ -33,19 +36,25 @@ export const ProductDetails = ({ addProductToCart }) => {
   const defaultData = useSelector(
     (state) => state.product.selectedProductDialog.defaultData
   );
-  console.log('DEFAULT DATA ', defaultData)
+  console.log("DEFAULT DATA ", defaultData);
   const [count, setCount] = useState(1);
   const [total, setTotal] = useState(null);
+  const [validationError, setValidationError] = useState(null);
+
+  console.log("VALIDATION ERROR ", validationError);
   const [selectedOptions, setSelectedOptions] = useState(null);
-  console.log('selectedOptions ', selectedOptions)
+  console.log("selectedOptions ", selectedOptions);
   const [checked, setChecked] = useState(false);
 
-  console.log('DEFAULT DATA ', defaultData);
-  console.log('SELECTED OPTIONS SELECTED OPTIONS SELECTED OPTIONS', selectedOptions);
+  // console.log("DEFAULT DATA ", defaultData);
+  // console.log(
+  //   "SELECTED OPTIONS SELECTED OPTIONS SELECTED OPTIONS",
+  //   selectedOptions
+  // );
   useEffect(() => {
     if (defaultData) {
-      setTotal(defaultData.price)
-      setSelectedOptions(null)
+      setTotal(defaultData.price);
+      setSelectedOptions(null);
       let hash = {};
       defaultData.options &&
         defaultData.options.forEach((topping) => {
@@ -70,71 +79,75 @@ export const ProductDetails = ({ addProductToCart }) => {
           }
         });
     }
-
-  }, [defaultData, open])
+  }, [defaultData, open]);
 
   useEffect(() => {
     setTotal(defaultData.price * count);
   }, [count]);
 
-//   useEffect(() => {
+  useEffect(() => {}, [validationError]);
 
-//   }, [open]);
+  //   useEffect(() => {
+
+  //   }, [open]);
 
   useEffect(() => {
     setTotal(parseInt(defaultData.price));
     let totalTmp = parseInt(defaultData.price);
-    selectedOptions && Object.keys(selectedOptions).forEach((key, index) => {
-      //   console.log(`${key}: ${selectedToppings[key]}`);
-      if (Array.isArray(selectedOptions[key])) {
-        //Search for free_choices of this topping
-        const indexTopping = defaultData.options.findIndex(
-          (e) => e.name === key
-        );
+    selectedOptions &&
+      Object.keys(selectedOptions).forEach((key, index) => {
+        //   console.log(`${key}: ${selectedToppings[key]}`);
+        if (Array.isArray(selectedOptions[key])) {
+          //Search for free_choices of this topping
+          const indexTopping = defaultData.options.findIndex(
+            (e) => e.name === key
+          );
 
-        const freeChoices = indexTopping != -1 && defaultData.options[indexTopping].freeChoices;
-        // console.log("FREE CHOICES ", key, free_choices);
+          const freeChoices =
+            indexTopping != -1 && defaultData.options[indexTopping].freeChoices;
+          // console.log("FREE CHOICES ", key, free_choices);
 
-        // Remove all selected option to calcul how free option is already choose
-        const newArray = selectedOptions[key].filter((e) => e.name);
+          // Remove all selected option to calcul how free option is already choose
+          const newArray = selectedOptions[key].filter((e) => e.name);
 
-        // selectedToppings[key].forEach(e =>{
-        //     if(e.price){
-        //         // If already choosed all free_choices so add option price
+          // selectedToppings[key].forEach(e =>{
+          //     if(e.price){
+          //         // If already choosed all free_choices so add option price
 
-        //         if (newArray.length > free_choices) {
-        //             console.log('PRICE ', e.price)
-        //             totalTmp = parseInt(totalTmp) + parseInt(e.price)
-        //           }
-        //     }
-        // })
-        for (let i = freeChoices; i < newArray.length; i++) {
-          if (selectedOptions[key][i].price) {
-            // If already choosed all free_choices so add option price
+          //         if (newArray.length > free_choices) {
+          //             console.log('PRICE ', e.price)
+          //             totalTmp = parseInt(totalTmp) + parseInt(e.price)
+          //           }
+          //     }
+          // })
+          for (let i = freeChoices; i < newArray.length; i++) {
+            if (selectedOptions[key][i].price) {
+              // If already choosed all free_choices so add option price
 
-            if (newArray.length > freeChoices) {
-              console.log("PRICE ", selectedOptions[key][i].price);
-              totalTmp =
-                parseInt(totalTmp) + parseInt(selectedOptions[key][i].price);
+              if (newArray.length > freeChoices) {
+                console.log("PRICE ", selectedOptions[key][i].price);
+                totalTmp =
+                  parseInt(totalTmp) + parseInt(selectedOptions[key][i].price);
+              }
             }
           }
+        } else {
+          if (selectedOptions[key].price) {
+            // setTotal(parseInt(defaultData.price) + parseInt(selectedToppings[key].price))
+            totalTmp =
+              parseInt(totalTmp) + parseInt(selectedOptions[key].price);
+          }
         }
-      } else {
-        if (selectedOptions[key].price) {
-          // setTotal(parseInt(defaultData.price) + parseInt(selectedToppings[key].price))
-          totalTmp = parseInt(totalTmp) + parseInt(selectedOptions[key].price);
-        }
-      }
-    });
+      });
     setTotal(totalTmp);
   }, [selectedOptions]);
 
   const onClose = () => {
-    setCount(1)
-    setTotal(defaultData.price)
+    setCount(1);
+    setTotal(defaultData.price);
     setSelectedOptions(null);
     dispatch(closeSelectedProductDialog());
-    dispatch(resetSelectedProductDialog())
+    dispatch(resetSelectedProductDialog());
   };
 
   const incrementCount = () => {
@@ -149,11 +162,40 @@ export const ProductDetails = ({ addProductToCart }) => {
     }
   };
 
-  const handleSubmit = () => {
+  const handleValidation = async () => {
+    const promise = new Promise((resolve, reject) => {
+      Object.keys(selectedOptions).forEach((key) => {
+        defaultData.options.forEach((o) => {
+          if (key === o.name) {
+            console.log("key ", key);
+            console.log("selectedOptions ", selectedOptions[key]);
+            console.log("name ", o.name);
+            console.log("option min choice ", o.minChoices);
+            if (selectedOptions[key].name == null && o.minChoices >= 1) {
+              console.log("SET ERROR");
+              const productId = defaultData._id;
+              const error = { [productId]: { error: "Missing choice" } };
+              setValidationError(error);
+              resolve(false);
+            }
+            resolve(true);
+          }
+        });
+      });
+    });
+
+    const result = await promise;
+    return result;
+  };
+
+  const handleSubmit = async () => {
     //   console.log("SUBMIT", selectedToppings)
     // console.log("SUBMIT", defaultData);
-    const array = []
-    const { name, description, image, price, } = defaultData;
+    const array = [];
+    const { name, description, image, price } = defaultData;
+
+    console.log("SELECTED OPTIONS ", selectedOptions);
+
     const result = {
       id: uuidv4(),
       name,
@@ -163,27 +205,32 @@ export const ProductDetails = ({ addProductToCart }) => {
       options: selectedOptions,
       total: parseInt(total),
       count: count,
-
     };
-    console.log("SUBMIT", result);
+    // console.log("SUBMIT", result);
     // for(let i = 0; i<count; i++){
     //     console.log('FOR LOOP', count)
     //     array.push(result)
     // }
-    addProductToCart(result);
-    onClose()
+
+    const validation = await handleValidation();
+    console.log("VALIDATION ERROR ", validation);
+    if (!validation) {
+    } else {
+      addProductToCart(result);
+      onClose();
+    }
   };
 
   const selectCheckbox = (toppingIndex, optionIndex, topping, option) => {
-    console.log('selectCheckbox - topping ', topping)
-    console.log('selectCheckbox - option ', option)
+    // console.log('selectCheckbox - topping ', topping)
+    // console.log('selectCheckbox - option ', option)
     if (topping.maxChoices == 1) {
-      console.log('selectedOptions[topping.name] ', selectedOptions[topping.name])
+      // console.log('selectedOptions[topping.name] ', selectedOptions[topping.name])
       let updatedValue = {};
       if (selectedOptions[topping.name].name === option.name) {
-        updatedValue[topping.name] = { name: null, price: null};
+        updatedValue[topping.name] = { name: null, price: null };
       } else {
-        console.log('updatedValue - option ', option)
+        // console.log('updatedValue - option ', option)
         updatedValue[topping.name] = { name: option.name, price: option.price };
       }
       setSelectedOptions((selectedOptions) => ({
@@ -200,7 +247,7 @@ export const ProductDetails = ({ addProductToCart }) => {
           cloneArray[cloneArray.length - 1] = {
             name: option.name,
             price: option.price,
-            multiple: option.multiple
+            multiple: option.multiple,
           };
         }
         let updatedValue = {};
@@ -213,7 +260,11 @@ export const ProductDetails = ({ addProductToCart }) => {
         if (cloneArray[optionIndex].name === option.name) {
           cloneArray[optionIndex] = { name: null, price: null };
         } else {
-          cloneArray[optionIndex] = { name: option.name, price: option.price, multiple: option.multiple };
+          cloneArray[optionIndex] = {
+            name: option.name,
+            price: option.price,
+            multiple: option.multiple,
+          };
         }
         let updatedValue = {};
         updatedValue[topping.name] = cloneArray;
@@ -226,8 +277,8 @@ export const ProductDetails = ({ addProductToCart }) => {
   };
 
   const renderCheck = (topping, option) => {
-    console.log('RENDER CHECK')
-    console.log("SELECTED TOPPINGS ", selectedOptions);
+    // console.log('RENDER CHECK')
+    // console.log("SELECTED TOPPINGS ", selectedOptions);
     if (selectedOptions && topping.maxChoices <= 1) {
       if (
         selectedOptions[topping.name] &&
@@ -249,29 +300,38 @@ export const ProductDetails = ({ addProductToCart }) => {
   };
 
   const renderDisabled = (topping, option) => {
-
     // console.log('RENDER DISABLED ', topping)
     // console.log('RENDER DISABLED ', option)
-    const selectedToppingObject = selectedOptions && selectedOptions[topping.name];
+    const selectedToppingObject =
+      selectedOptions && selectedOptions[topping.name];
     // console.log('RENDER DISABLED selectedToppingObject ', selectedToppingObject)
     let boolean = false;
 
-
-    if(Array.isArray(selectedToppingObject)){
-        const maxChoices = topping.maxChoices;
-        const filteredArray = selectedToppingObject.filter(e => e.name)
-        const index = selectedToppingObject.findIndex(e => e.name === option.name);
-        if(filteredArray.length > 0 && filteredArray.length >= maxChoices && index == -1){
-            boolean = true;
-        }
-        console.log('RENDER DISABLED FILTERED ARRAY ', filteredArray)
-    }else{
-        if((selectedToppingObject && selectedToppingObject.name && selectedToppingObject.name !== option.name )){
-            boolean = true;
-        }
+    if (Array.isArray(selectedToppingObject)) {
+      const maxChoices = topping.maxChoices;
+      const filteredArray = selectedToppingObject.filter((e) => e.name);
+      const index = selectedToppingObject.findIndex(
+        (e) => e.name === option.name
+      );
+      if (
+        filteredArray.length > 0 &&
+        filteredArray.length >= maxChoices &&
+        index == -1
+      ) {
+        boolean = true;
+      }
+      // console.log('RENDER DISABLED FILTERED ARRAY ', filteredArray)
+    } else {
+      if (
+        selectedToppingObject &&
+        selectedToppingObject.name &&
+        selectedToppingObject.name !== option.name
+      ) {
+        boolean = true;
+      }
     }
 
-    return boolean
+    return boolean;
     // const toppingIndex = selectedToppings.findIndex( toppingElement => toppingElement.name === topping.name)
     // let condition = false;
     // if(toppingIndex !== -1){
@@ -292,7 +352,11 @@ export const ProductDetails = ({ addProductToCart }) => {
     const cloneArray = [...selectedOptions[topping.name]];
     for (let i = 0; i < cloneArray.length; i++) {
       if (!cloneArray[i].name) {
-        cloneArray[i] = { name: option.name, price: option.price, multiple: option.multiple };
+        cloneArray[i] = {
+          name: option.name,
+          price: option.price,
+          multiple: option.multiple,
+        };
         break;
       }
     }
@@ -325,22 +389,23 @@ export const ProductDetails = ({ addProductToCart }) => {
     // console.log("FREE CHOICES ", topping.name, free_choices);
     let newArray = [];
     let boolean = false;
-    if(selectedOptions){
-        Object.keys(selectedOptions).forEach((key, index) => {
-            if (key === topping.name && Array.isArray(selectedOptions[key])) {
-              newArray = selectedOptions[key].filter((e) => e.name);
-              if (newArray.length >= topping.freeChoices) {
-                boolean = true;
-              }
-            }
-          });
+    if (selectedOptions) {
+      Object.keys(selectedOptions).forEach((key, index) => {
+        if (key === topping.name && Array.isArray(selectedOptions[key])) {
+          newArray = selectedOptions[key].filter((e) => e.name);
+          if (newArray.length >= topping.freeChoices) {
+            boolean = true;
+          }
+        }
+      });
     }
 
     let selectedOptionIndex =
-    selectedOptions && Array.isArray(selectedOptions[topping.name]) &&
-    selectedOptions[topping.name].findIndex((e) => e.name === option.name);
+      selectedOptions &&
+      Array.isArray(selectedOptions[topping.name]) &&
+      selectedOptions[topping.name].findIndex((e) => e.name === option.name);
 
-    console.log("OPTION ", option);
+    // console.log("OPTION ", option);
 
     // console.log("NEW ARRAY ", newArray);
     // if (boolean && selectedOptionIndex === -1)
@@ -360,9 +425,9 @@ export const ProductDetails = ({ addProductToCart }) => {
   };
 
   const renderToppingOption = (toppingIndex, optionIndex, topping, option) => {
-    console.log('OPTION OPTION ', option)
+    // console.log('OPTION OPTION ', option)
     const disabled = renderDisabled(topping, option);
-    console.log("DISABLED ", disabled);
+    // console.log("DISABLED ", disabled);
 
     // Check how many choices are already selected
     let newArrayEachOptionSelected = [];
@@ -379,10 +444,10 @@ export const ProductDetails = ({ addProductToCart }) => {
       );
     }
 
-    console.log(
-      "ALL OPTIONS ALREADY SELECTED ",
-      newArrayAllOptionsSelected.length
-    );
+    // console.log(
+    //   "ALL OPTIONS ALREADY SELECTED ",
+    //   newArrayAllOptionsSelected.length
+    // );
 
     return (
       <Box display="flex" flexDirection="row" justifyContent="space-between">
@@ -463,20 +528,27 @@ export const ProductDetails = ({ addProductToCart }) => {
                     </Typography>
                   ) : null}
                   <Box display="flex" flexDirection="column">
-                    {topping.choices.map(
-                      (option, optionIndex) =>
-                        renderToppingOption(
-                          toppingIndex,
-                          optionIndex,
-                          topping,
-                          option
-                        )
+                    {topping.choices.map((option, optionIndex) =>
+                      renderToppingOption(
+                        toppingIndex,
+                        optionIndex,
+                        topping,
+                        option
+                      )
                     )}
                   </Box>
                 </Box>
               ))}
           </Box>
+          {validationError && validationError[defaultData._id] && (
+            <Box>
+              <Typography variant="caption" color={"red"}>
+                {validationError[defaultData._id].error}
+              </Typography>
+            </Box>
+          )}
         </Box>
+        <Box></Box>
         <Box sx={{ position: "sticky", bottom: 0 }}>
           <Card
             variant="outlined"

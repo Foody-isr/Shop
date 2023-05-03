@@ -13,16 +13,21 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
-import useAuth from "../hooks/useAuth";
+// import useAuth from "../hooks/useAuth";
 import { NavLink, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { openModal } from "../pages/auth/state/authSlice";
+import { useAuthenticator } from "@aws-amplify/ui-react";
+import { useAuthContext } from "../auth/useAuthContext";
 
 const pages = ["Restaurants", "Pricing", "Blog"];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
 const ResponsiveAppBar = () => {
-  const { user, signOut } = useAuth();
+  const { signOut } = useAuthenticator((context) => [context.user]);
+  const { user } = useAuthContext();
   const navigate = useNavigate();
-  console.log("USER ", user);
+  const dispatch = useDispatch();
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
 
@@ -34,7 +39,6 @@ const ResponsiveAppBar = () => {
   };
 
   const handleCloseNavMenu = async (page) => {
-    console.log("page", page);
     if (page === "Restaurants") {
       navigate("/");
       setAnchorElNav(null);
@@ -43,9 +47,10 @@ const ResponsiveAppBar = () => {
 
   const handleCloseUserMenu = async (setting) => {
     if (setting === "Logout") {
-      await signOut();
-      setAnchorElUser(null);
-      navigate("/");
+      // await signOut();
+      // setAnchorElUser(null);
+      // navigate("/");
+      signOut();
     } else if (setting === "Profile") {
       setAnchorElUser(null);
       navigate("/user/profile/overview");
@@ -123,30 +128,15 @@ const ResponsiveAppBar = () => {
           </Box>
 
           <Box sx={{ flexGrow: 0 }}>
-            {/* <Tooltip title="Open settings">
-              {user ? (
-                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar>{user.first_name && user.first_name[0]}</Avatar>
-                </IconButton>
-              ) : (
-                <NavLink
-                  to={
-                    "https://auth.foody-app.co/oauth2/authorize?client_id=341mclabt5p0437nm1rcqo0rl7&response_type=token&scope=email+openid+phone&redirect_uri=https%3A%2F%2Fshop.foody-app.co"
-                  }
-                >
-                  Login
-                </NavLink>
-              )}
-            </Tooltip> */}
-            <button
-              onClick={() =>
-                Auth.federatedSignIn({
-                  provider: CognitoHostedUIIdentityProvider.Google,
-                })
-              }
-            >
-              Open Google
-            </button>
+            {user ? (
+              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                <Avatar>{user.first_name && user.first_name[0]}</Avatar>
+              </IconButton>
+            ) : (
+              <Button title="Login" onClick={() => dispatch(openModal())}>
+                Login
+              </Button>
+            )}
             <Menu
               sx={{ mt: "45px" }}
               id="menu-appbar"

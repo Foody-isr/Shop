@@ -1,31 +1,32 @@
 import { Box, Container, Tab, Tabs, Typography } from "@mui/material";
 import { Link, Navigate, Outlet } from "react-router-dom";
 import React, { useEffect } from "react";
-import useAuth from "../../hooks/useAuth";
 import { fetchUserDetails } from "./state/userSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { useAuthContext } from "../../auth/useAuthContext";
 
 function LinkTab(props) {
   return <Tab component={Link} to={props.href} {...props} />;
 }
 
 export const Profile = () => {
+  const { user } = useAuthContext();
   const [value, setValue] = React.useState(0);
-  const { user } = useAuth()
-  const dispatch = useDispatch()
+  // const { user, signOut } = useAuthenticator((context) => [context.user]);
+  const dispatch = useDispatch();
 
   const handleChange = (event, newValue) => {
-    console.log("NEW VALUE", newValue);
+    // console.log("NEW VALUE", newValue);
     setValue(newValue);
   };
 
-  console.log('USER PROFILE ', user)
+  // console.log("USER PROFILE ", user);
 
-  useEffect(() => {
-    if(user){
-      dispatch(fetchUserDetails(user))
-    }
-  }, [user])
+  // useEffect(() => {
+  //   if (user) {
+  //     dispatch(fetchUserDetails(user));
+  //   }
+  // }, [user]);
 
   return (
     <Container>

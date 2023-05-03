@@ -24,7 +24,7 @@ import { OrderDialog } from "./OrderDialog";
 import _ from "lodash";
 import { keyboardImplementationWrapper } from "@testing-library/user-event/dist/keyboard";
 import { OtherHouses } from "@mui/icons-material";
-import useAuth from "../../hooks/useAuth";
+// import useAuth from "../../hooks/useAuth";
 
 const SpacerLeft = styled.div`
   margin-left: 20px;
@@ -45,15 +45,15 @@ const CategoriesContainer = styled(Paper)(({ theme }) => ({
   borderBottom: `1px solid ${theme.palette.grey[300]}`,
 }));
 
-const Chip = styled(Box)(({ theme }) => ({
-  backgroundColor: theme.palette.common.white,
-  width: "30px",
-  height: "30px",
-  borderRadius: "15px",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-}));
+// const Chip = styled(Box)(({ theme }) => ({
+//   backgroundColor: theme.palette.common.white,
+//   width: "30px",
+//   height: "30px",
+//   borderRadius: "15px",
+//   display: "flex",
+//   alignItems: "center",
+//   justifyContent: "center",
+// }));
 
 const CategoryLink = styled.a`
   color: inherit;
@@ -65,7 +65,7 @@ const CategoryLink = styled.a`
 // `;
 
 export const RestaurantDetails = () => {
-  const { user } = useAuth();
+  // const { user } = useAuth();
   const navigate = useNavigate();
   const theme = useTheme();
   const mobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -399,11 +399,11 @@ export const RestaurantDetails = () => {
             fullWidth
             onClick={() => setOrderDialog(true)}
           >
-            <Chip>
+            {/* <Chip>
               <Typography variant="h4" fontWeight={900} color="primary">
                 {totalItemsOrder}
               </Typography>
-            </Chip>
+            </Chip> */}
             <Typography variant="h4" fontWeight={900} ml={2} mr={2}>
               View order
             </Typography>
