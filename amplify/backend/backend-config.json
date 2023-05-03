@@ -1,53 +1,12 @@
 {
-  "auth": {
-    "shopb2a0f07e": {
-      "customAuth": false,
-      "dependsOn": [],
-      "providerPlugin": "awscloudformation",
-      "service": "Cognito",
-      "serviceType": "imported"
-    }
-  },
   "hosting": {
     "amplifyhosting": {
-      "lastPushTimeStamp": "2023-04-24T16:16:48.530Z",
+      "lastPushTimeStamp": "2023-05-03T15:22:43.682Z",
       "service": "amplifyhosting",
       "type": "cicd"
     }
   },
   "parameters": {
-    "AMPLIFY_auth_shopb2a0f07e_nativeClientId": {
-      "usedBy": [
-        {
-          "category": "auth",
-          "resourceName": "shopb2a0f07e"
-        }
-      ]
-    },
-    "AMPLIFY_auth_shopb2a0f07e_userPoolId": {
-      "usedBy": [
-        {
-          "category": "auth",
-          "resourceName": "shopb2a0f07e"
-        }
-      ]
-    },
-    "AMPLIFY_auth_shopb2a0f07e_userPoolName": {
-      "usedBy": [
-        {
-          "category": "auth",
-          "resourceName": "shopb2a0f07e"
-        }
-      ]
-    },
-    "AMPLIFY_auth_shopb2a0f07e_webClientId": {
-      "usedBy": [
-        {
-          "category": "auth",
-          "resourceName": "shopb2a0f07e"
-        }
-      ]
-    },
     "AMPLIFY_hosting_amplifyhosting_appId": {
       "usedBy": [
         {
