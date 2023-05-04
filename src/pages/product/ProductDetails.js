@@ -164,6 +164,9 @@ export const ProductDetails = ({ addProductToCart }) => {
 
   const handleValidation = async () => {
     const promise = new Promise((resolve, reject) => {
+      if (!selectedOptions && defaultData.options.length == 0) {
+        resolve(true);
+      }
       Object.keys(selectedOptions).forEach((key) => {
         defaultData.options.forEach((o) => {
           if (key === o.name) {
@@ -189,35 +192,31 @@ export const ProductDetails = ({ addProductToCart }) => {
   };
 
   const handleSubmit = async () => {
-    //   console.log("SUBMIT", selectedToppings)
-    // console.log("SUBMIT", defaultData);
-    const array = [];
-    const { name, description, image, price } = defaultData;
+    try {
+      const array = [];
+      const { name, description, image, price } = defaultData;
 
-    console.log("SELECTED OPTIONS ", selectedOptions);
+      console.log("SELECTED OPTIONS ", selectedOptions);
 
-    const result = {
-      id: uuidv4(),
-      name,
-      description,
-      image,
-      price,
-      options: selectedOptions,
-      total: parseInt(total),
-      count: count,
-    };
-    // console.log("SUBMIT", result);
-    // for(let i = 0; i<count; i++){
-    //     console.log('FOR LOOP', count)
-    //     array.push(result)
-    // }
-
-    const validation = await handleValidation();
-    console.log("VALIDATION ERROR ", validation);
-    if (!validation) {
-    } else {
-      addProductToCart(result);
-      onClose();
+      const result = {
+        id: uuidv4(),
+        name,
+        description,
+        image,
+        price,
+        options: selectedOptions || [],
+        total: parseInt(total),
+        count: count,
+      };
+      const validation = await handleValidation();
+      if (!validation) {
+        console.log("VALIDATION ERROR ", validation);
+      } else {
+        addProductToCart(result);
+        onClose();
+      }
+    } catch (err) {
+      console.log("err ", err);
     }
   };
 
