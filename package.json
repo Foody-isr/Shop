@@ -2,6 +2,7 @@
   "name": "shop",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://Foody-isr.github.io/Shop",
   "dependencies": {
     "@aws-amplify/ui-react": "^4.6.0",
     "@emotion/react": "^11.10.6",
@@ -47,7 +48,9 @@
     "build": "react-scripts build",
     "build:dev": "env-cmd -f .env.dev npm run-script build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build:dev",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
@@ -66,5 +69,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "gh-pages": "^5.0.0"
   }
 }
