@@ -21,19 +21,20 @@ import createTheme from "./theme";
 import Loader from "./components/Loader";
 import { Dialog } from "@mui/material";
 import { closeModal } from "./pages/auth/state/authSlice";
+import awsconfig from "./aws-exports";
 
 const jss = create({
   ...jssPreset(),
   insertionPoint: document.getElementById("jss-insertion-point"),
 });
 
-// Amplify.configure(awsExports);
+Amplify.configure(awsconfig);
 
-Amplify.configure({
-  aws_cognito_region: "us-east-1", // (required) - Region where Amazon Cognito project was created
-  aws_user_pools_id: "us-east-1_6AfQ6", // (optional) -  Amazon Cognito User Pool ID
-  aws_user_pools_web_client_id: "341mclabt5p0437nm1rcqo0rl7", // (optional) - Amazon Cognito App Client ID (App client secret needs to be disabled)
-});
+// Amplify.configure({
+//   aws_cognito_region: "us-east-1", // (required) - Region where Amazon Cognito project was created
+//   aws_user_pools_id: "us-east-1_6AfQ6", // (optional) -  Amazon Cognito User Pool ID
+//   aws_user_pools_web_client_id: "341mclabt5p0437nm1rcqo0rl7", // (optional) - Amazon Cognito App Client ID (App client secret needs to be disabled)
+// });
 
 function App() {
   const theme = useTheme();
