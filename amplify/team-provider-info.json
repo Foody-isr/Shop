@@ -1,0 +1,25 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-shop-dev-203257-authRole",
+      "UnauthRoleArn": "arn:aws:iam::196923226349:role/amplify-shop-dev-203257-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::196923226349:role/amplify-shop-dev-203257-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-shop-dev-203257-deployment",
+      "UnauthRoleName": "amplify-shop-dev-203257-unauthRole",
+      "StackName": "amplify-shop-dev-203257",
+      "StackId": "arn:aws:cloudformation:us-east-1:196923226349:stack/amplify-shop-dev-203257/045fb360-03c7-11ee-a9c6-123a4e9c7601",
+      "AmplifyAppId": "d2afgs67flhj7c"
+    },
+    "categories": {
+      "auth": {
+        "shop150c05b9": {
+          "userPoolId": "us-east-1_cDd9TR9a5",
+          "userPoolName": "Foody2",
+          "webClientId": "341mclabt5p0437nm1rcqo0rl7",
+          "nativeClientId": "341mclabt5p0437nm1rcqo0rl7"
+        }
+      }
+    }
+  }
+}
